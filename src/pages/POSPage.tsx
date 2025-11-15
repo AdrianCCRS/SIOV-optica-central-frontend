@@ -78,11 +78,9 @@ export default function POSPage() {
   const totales = calcularTotales();
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', padding: '20px', height: '100vh' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', padding: '20px', height: '100%' }}>
       {/* Panel izquierdo - Productos */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <h1>POS - Sistema de Ventas</h1>
-        
         <input
           type="text"
           placeholder="Buscar producto por nombre o referencia..."

@@ -78,7 +78,7 @@ export default function POSPage() {
   };
 
   const totales = calcularTotales();
-
+  console.log(clientes)
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', padding: '20px', height: '100%' }}>
       {/* Panel izquierdo - Productos */}

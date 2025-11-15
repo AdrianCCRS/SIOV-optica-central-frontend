@@ -1,15 +1,13 @@
 import api from './api';
 
 export interface ProductoVenta {
-  producto_id: number;
+  productoId: number;
   cantidad: number;
-  precio_unitario: number;
-  porcentaje_iva: number;
 }
 
 export interface RegistrarVentaData {
-  cliente_id: number;
-  metodo_pago: 'efectivo' | 'tarjeta' | 'transferencia';
+  clienteId: number;
+  medioPago: 'Efectivo' | 'Tarjeta Débito' | 'Tarjeta Crédito' | 'Transferencia' | 'Otro';
   productos: ProductoVenta[];
   observaciones?: string;
 }

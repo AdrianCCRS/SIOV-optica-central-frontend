@@ -64,14 +64,20 @@ export default function POSPage() {
       return;
     }
 
+    // Mapear método de pago a los valores del enum del backend
+    type MedioPago = 'Efectivo' | 'Tarjeta Débito' | 'Tarjeta Crédito' | 'Transferencia' | 'Otro';
+    const metodoPagoMap: Record<string, MedioPago> = {
+      'efectivo': 'Efectivo',
+      'tarjeta': 'Tarjeta Débito',
+      'transferencia': 'Transferencia',
+    };
+
     const data = {
-      cliente_id: clienteSeleccionado,
-      metodo_pago: metodoPago,
+      clienteId: clienteSeleccionado,
+      medioPago: metodoPagoMap[metodoPago] || 'Efectivo' as MedioPago,
       productos: items.map(item => ({
-        producto_id: item.producto.id,
+        productoId: item.producto.id,
         cantidad: item.cantidad,
-        precio_unitario: item.producto.precio_unitario,
-        porcentaje_iva: item.producto.porcentaje_iva,
       })),
     };
 

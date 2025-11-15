@@ -4,11 +4,13 @@ import { productosService } from '../services/productos.service';
 import { clientesService } from '../services/clientes.service';
 import { ventasService } from '../services/ventas.service';
 import { useCarritoStore } from '../store/carritoStore';
+import NuevoClienteModal from '../components/NuevoClienteModal';
 
 export default function POSPage() {
   const [busquedaProducto, setBusquedaProducto] = useState('');
   const [clienteSeleccionado, setClienteSeleccionado] = useState<number | null>(null);
   const [metodoPago, setMetodoPago] = useState<'efectivo' | 'tarjeta' | 'transferencia'>('efectivo');
+  const [mostrarModalCliente, setMostrarModalCliente] = useState(false);
 
   const { items, agregarProducto, actualizarCantidad, eliminarProducto, limpiarCarrito, calcularTotales } = useCarritoStore();
 
@@ -128,18 +130,36 @@ export default function POSPage() {
         {/* Selector de cliente */}
         <div>
           <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Cliente:</label>
-          <select
-            value={clienteSeleccionado || ''}
-            onChange={(e) => setClienteSeleccionado(Number(e.target.value))}
-            style={{ width: '100%', padding: '8px' }}
-          >
-            <option value="">Seleccionar cliente...</option>
-            {clientes.map((cliente) => (
-              <option key={cliente.id} value={cliente.id}>
-                {cliente.nombres} {cliente.apellidos} - {cliente.numero_identificacion}
-              </option>
-            ))}
-          </select>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <select
+              value={clienteSeleccionado || ''}
+              onChange={(e) => setClienteSeleccionado(Number(e.target.value))}
+              style={{ flex: 1, padding: '8px' }}
+            >
+              <option value="">Seleccionar cliente...</option>
+              {clientes.map((cliente) => (
+                <option key={cliente.id} value={cliente.id}>
+                  {cliente.nombres} {cliente.apellidos} - {cliente.numero_identificacion}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => setMostrarModalCliente(true)}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#2196F3',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                whiteSpace: 'nowrap',
+              }}
+              title="Crear nuevo cliente"
+            >
+              + Nuevo
+            </button>
+          </div>
         </div>
 
         {/* Items del carrito */}
@@ -226,6 +246,17 @@ export default function POSPage() {
           </button>
         </div>
       </div>
+
+      {/* Modal de nuevo cliente */}
+      {mostrarModalCliente && (
+        <NuevoClienteModal
+          onClose={() => setMostrarModalCliente(false)}
+          onClienteCreado={(cliente) => {
+            setClienteSeleccionado(cliente.id);
+            setMostrarModalCliente(false);
+          }}
+        />
+      )}
     </div>
   );
 }

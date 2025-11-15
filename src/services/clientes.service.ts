@@ -2,7 +2,7 @@ import api from './api';
 
 export interface Cliente {
   id: number;
-  tipo_identificacion: 'cedula' | 'ruc' | 'pasaporte';
+  tipo_identificacion: 'CC' | 'CE' | 'NIT' | 'Pasaporte';
   numero_identificacion: string;
   nombres: string;
   apellidos: string;

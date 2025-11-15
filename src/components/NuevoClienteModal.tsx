@@ -10,7 +10,7 @@ interface NuevoClienteModalProps {
 
 export default function NuevoClienteModal({ onClose, onClienteCreado }: NuevoClienteModalProps) {
   const [formData, setFormData] = useState({
-    tipo_identificacion: 'cedula' as 'cedula' | 'ruc' | 'pasaporte',
+    tipo_identificacion: 'CC' as 'CC' | 'CE' | 'NIT' | 'Pasaporte',
     numero_identificacion: '',
     nombres: '',
     apellidos: '',
@@ -105,9 +105,10 @@ export default function NuevoClienteModal({ onClose, onClienteCreado }: NuevoCli
                 style={{ width: '100%', padding: '8px' }}
                 required
               >
-                <option value="cedula">Cédula</option>
-                <option value="ruc">RUC</option>
-                <option value="pasaporte">Pasaporte</option>
+                <option value="CC">Cédula de Ciudadanía (CC)</option>
+                <option value="CE">Cédula de Extranjería (CE)</option>
+                <option value="NIT">NIT</option>
+                <option value="Pasaporte">Pasaporte</option>
               </select>
             </div>
 

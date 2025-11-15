@@ -5,6 +5,7 @@ import { clientesService } from '../services/clientes.service';
 import { ventasService } from '../services/ventas.service';
 import { useCarritoStore } from '../store/carritoStore';
 import NuevoClienteModal from '../components/NuevoClienteModal';
+import { formatCurrency } from '../utils/format';
 
 export default function POSPage() {
   const [busquedaProducto, setBusquedaProducto] = useState('');
@@ -32,7 +33,7 @@ export default function POSPage() {
   const registrarVentaMutation = useMutation({
     mutationFn: ventasService.registrarVenta,
     onSuccess: (data) => {
-      alert(`¡Venta registrada exitosamente!\nFactura: ${data.numero_factura}\nTotal: $${data.total.toFixed(2)}`);
+      alert(`¡Venta registrada exitosamente!\nFactura: ${data.numero_factura}\nTotal: ${formatCurrency(data.total)}`);
       limpiarCarrito();
       setClienteSeleccionado(null);
     },
@@ -78,10 +79,9 @@ export default function POSPage() {
   };
 
   const totales = calcularTotales();
-  console.log(clientes)
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', padding: '20px', height: '100%' }}>
-      {/* Panel izquierdo - Productos */}
+      {/* Panel izquierdos - Productos */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <input
           type="text"
@@ -112,7 +112,7 @@ export default function POSPage() {
                 <h3 style={{ margin: '0 0 8px 0', fontSize: '14px' }}>{producto.nombre}</h3>
                 <p style={{ margin: '4px 0', fontSize: '12px', color: '#666' }}>Ref: {producto.referencia}</p>
                 <p style={{ margin: '4px 0', fontSize: '16px', fontWeight: 'bold' }}>
-                  ${producto.precio_unitario.toFixed(2)}
+                  {formatCurrency(producto.precio_unitario)}
                 </p>
                 <p style={{ margin: '4px 0', fontSize: '12px', color: producto.stock_actual <= producto.stock_minimo ? 'red' : 'green' }}>
                   Stock: {producto.stock_actual}
@@ -173,7 +173,7 @@ export default function POSPage() {
                   <div style={{ flex: 1 }}>
                     <p style={{ margin: '0', fontWeight: 'bold', fontSize: '14px' }}>{item.producto.nombre}</p>
                     <p style={{ margin: '4px 0', fontSize: '12px', color: '#666' }}>
-                      ${item.producto.precio_unitario.toFixed(2)} (IVA {item.producto.porcentaje_iva}%)
+                      {formatCurrency(item.producto.precio_unitario)} (IVA {item.producto.porcentaje_iva}%)
                     </p>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -191,7 +191,7 @@ export default function POSPage() {
                   </div>
                 </div>
                 <p style={{ margin: '4px 0', textAlign: 'right', fontWeight: 'bold' }}>
-                  ${item.total.toFixed(2)}
+                  {formatCurrency(item.total)}
                 </p>
               </div>
             ))
@@ -216,15 +216,15 @@ export default function POSPage() {
         <div style={{ borderTop: '2px solid #333', paddingTop: '10px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
             <span>Subtotal:</span>
-            <span>${totales.subtotal.toFixed(2)}</span>
+            <span>{formatCurrency(totales.subtotal)}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
             <span>IVA:</span>
-            <span>${totales.totalIva.toFixed(2)}</span>
+            <span>{formatCurrency(totales.totalIva)}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '20px', fontWeight: 'bold' }}>
             <span>Total:</span>
-            <span>${totales.total.toFixed(2)}</span>
+            <span>{formatCurrency(totales.total)}</span>
           </div>
         </div>
 

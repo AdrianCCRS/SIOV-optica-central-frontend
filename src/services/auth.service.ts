@@ -1,4 +1,4 @@
-import api from './api';
+import { authApi } from './api';
 
 export interface LoginCredentials {
   identifier: string; // email o username
@@ -20,7 +20,7 @@ export interface AuthResponse {
 export const authService = {
   // Login de usuario
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await api.post('/auth/local', credentials);
+    const response = await authApi.post('/api/auth/local', credentials);
     
     // Guardar token en localStorage
     if (response.data.jwt) {
@@ -33,7 +33,7 @@ export const authService = {
 
   // Obtener usuario actual
   async me(): Promise<AuthUser> {
-    const response = await api.get('/users/me');
+    const response = await authApi.get('/api/users/me');
     return response.data;
   },
 

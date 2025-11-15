@@ -1,8 +1,18 @@
 import axios from 'axios';
 
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:1337';
+
 // Configuración base de Axios para conectar con Strapi
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:1337/api',
+  baseURL: `${BASE_URL}/api`,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Instancia separada para autenticación (sin /api)
+export const authApi = axios.create({
+  baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -27,7 +37,8 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Token expirado o inválido
       localStorage.removeItem('jwt_token');
-      window.location.href = '/login';
+      localStorage.removeItem('user');
+      window.location.href = '/';
     }
     return Promise.reject(error);
   }

@@ -253,7 +253,7 @@ export default function MovimientosInventarioPage() {
                 </td>
                 <td style={{ 
                   padding: '12px', 
-                  textAlign: 'right',
+                  textAlign: 'center',
                   fontWeight: 'bold',
                   color: movimiento.tipo_movimiento === 'Entrada' || movimiento.tipo_movimiento === 'Devolución' ? '#4CAF50' : 
                          movimiento.tipo_movimiento === 'Salida' ? '#f44336' : '#FF9800'

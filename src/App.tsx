@@ -41,7 +41,7 @@ function AppContent() {
         case 'bodeguero':
           setCurrentPage('productos');
           break;
-        case 'vendedor':
+        case 'cajero':
         case 'authenticated':
         default:
           setCurrentPage('pos');
@@ -51,8 +51,25 @@ function AppContent() {
   }, [user, isLoading]);
 
   const roleType = user?.role?.type?.toLowerCase();
+  console.log('Determining pages for roleType:', roleType);
   const isBodeguero = roleType === 'bodeguero';
-  const isVendedor = roleType === 'vendedor' || roleType === 'authenticated';
+  const isCajero = roleType === 'cajero' || roleType === 'authenticated';
+
+  // Log para depuración
+  useEffect(() => {
+    console.log('Estado actual:', {
+      currentPage,
+      roleType,
+      isBodeguero,
+      isCajero: isCajero,
+      user: user?.username
+    });
+  }, [currentPage, roleType, isBodeguero, isCajero, user]);
+
+  const handleNavigate = (page: POSPage | BodegaPage) => {
+    console.log('handleNavigate llamado con:', page);
+    setCurrentPage(page);
+  };
 
   const renderPage = () => {
     // Si es bodeguero, mostrar páginas de bodega
@@ -69,8 +86,8 @@ function AppContent() {
       }
     }
     
-    // Si es vendedor o rol por defecto, mostrar páginas de POS
-    if (isVendedor) {
+    // Si es cajero o rol por defecto, mostrar páginas de POS
+    if (isCajero) {
       switch (currentPage) {
         case 'pos':
           return <POSPage />;
@@ -95,7 +112,7 @@ function AppContent() {
   return (
     <ProtectedRoute>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-        <Header currentPage={currentPage} onNavigate={setCurrentPage} />
+        <Header currentPage={currentPage} onNavigate={handleNavigate} />
         <div style={{ flex: 1, overflow: 'auto' }}>
           {renderPage()}
         </div>

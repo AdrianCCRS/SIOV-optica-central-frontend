@@ -14,7 +14,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
   // Determinar el tipo de rol del usuario
   const roleType = user?.role?.type?.toLowerCase();
   const isBodeguero = roleType === 'bodeguero';
-  const isVendedor = roleType === 'vendedor' || roleType === 'authenticated';
+  const isCajero = roleType === 'cajero' || roleType === 'authenticated';
 
   const handleLogout = () => {
     if (window.confirm('¿Estás seguro de que deseas cerrar sesión?')) {
@@ -26,7 +26,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
   // Título según el rol
   const getTitle = () => {
     if (isBodeguero) return 'Gestión de Bodega';
-    if (isVendedor) return 'Sistema de Ventas';
+    if (isCajero) return 'Sistema de Ventas';
     return 'Sistema';
   };
 
@@ -136,10 +136,13 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
             </button>
           </>
         ) : (
-          // Tabs para vendedor (POS)
+          // Tabs para cajero (POS)
           <>
             <button
-              onClick={() => onNavigate('pos' as any)}
+              onClick={() => {
+                console.log('Navegando a: pos');
+                onNavigate('pos' as any);
+              }}
               style={{
                 padding: '12px 24px',
                 backgroundColor: currentPage === 'pos' ? 'white' : 'transparent',
@@ -154,7 +157,10 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
               Punto de Venta
             </button>
             <button
-              onClick={() => onNavigate('ventas' as any)}
+              onClick={() => {
+                console.log('Navegando a: ventas');
+                onNavigate('ventas' as any);
+              }}
               style={{
                 padding: '12px 24px',
                 backgroundColor: currentPage === 'ventas' ? 'white' : 'transparent',
@@ -169,7 +175,10 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
               Ventas del Día
             </button>
             <button
-              onClick={() => onNavigate('historico' as any)}
+              onClick={() => {
+                console.log('Navegando a: historico');
+                onNavigate('historico' as any);
+              }}
               style={{
                 padding: '12px 24px',
                 backgroundColor: currentPage === 'historico' ? 'white' : 'transparent',

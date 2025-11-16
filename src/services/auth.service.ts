@@ -10,6 +10,8 @@ export interface AuthUser {
   username: string;
   email: string;
   blocked: boolean;
+  nombres?: string;
+  apellidos?: string;
 }
 
 export interface AuthResponse {

@@ -53,7 +53,7 @@ export default function LoginPage() {
         maxWidth: '400px',
       }}>
         <h1 style={{ textAlign: 'center', marginBottom: '30px' }}>
-          SIOV - Sistema de Ventas
+          Ópica Central - Sistema de Ventas
         </h1>
         
         <form onSubmit={handleSubmit}>

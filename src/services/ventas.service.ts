@@ -15,31 +15,39 @@ export interface RegistrarVentaData {
 export interface VentaResponse {
   id: number;
   numero_factura: string;
-  fecha: string;
+  fecha_emision: string;
   subtotal: number;
-  total_iva: number;
+  valor_iva: number;
   total: number;
-  metodo_pago: string;
+  medio_pago: string;
   cliente: any;
+  user?: any;
   detalles: any[];
+}
+
+export interface VentasDelDiaResponse {
+  fecha: string;
+  cantidad_ventas: number;
+  total_ventas: number;
+  facturas: VentaResponse[];
 }
 
 export const ventasService = {
   // Registrar una nueva venta
-  async registrarVenta(data: RegistrarVentaData): Promise<VentaResponse> {
+  async registrarVenta(data: RegistrarVentaData): Promise<any> {
     const response = await api.post('/ventas/registrar', data);
     return response.data;
   },
 
   // Obtener ventas del día
-  async obtenerVentasDelDia(): Promise<VentaResponse[]> {
+  async obtenerVentasDelDia(): Promise<VentasDelDiaResponse> {
     const response = await api.get('/ventas/del-dia');
     return response.data;
   },
 
   // Obtener detalle de una factura
   async obtenerFactura(id: number): Promise<VentaResponse> {
-    const response = await api.get(`/facturas/${id}?populate=*`);
+    const response = await api.get(`/facturas/${id}`);
     return response.data.data;
   },
 };

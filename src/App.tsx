@@ -51,23 +51,10 @@ function AppContent() {
   }, [user, isLoading]);
 
   const roleType = user?.role?.type?.toLowerCase();
-  console.log('Determining pages for roleType:', roleType);
   const isBodeguero = roleType === 'bodeguero';
   const isCajero = roleType === 'cajero' || roleType === 'authenticated';
 
-  // Log para depuración
-  useEffect(() => {
-    console.log('Estado actual:', {
-      currentPage,
-      roleType,
-      isBodeguero,
-      isCajero: isCajero,
-      user: user?.username
-    });
-  }, [currentPage, roleType, isBodeguero, isCajero, user]);
-
   const handleNavigate = (page: POSPage | BodegaPage) => {
-    console.log('handleNavigate llamado con:', page);
     setCurrentPage(page);
   };
 

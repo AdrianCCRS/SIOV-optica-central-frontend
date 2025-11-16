@@ -139,10 +139,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
           // Tabs para cajero (POS)
           <>
             <button
-              onClick={() => {
-                console.log('Navegando a: pos');
-                onNavigate('pos' as any);
-              }}
+              onClick={() => onNavigate('pos' as any)}
               style={{
                 padding: '12px 24px',
                 backgroundColor: currentPage === 'pos' ? 'white' : 'transparent',
@@ -157,10 +154,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
               Punto de Venta
             </button>
             <button
-              onClick={() => {
-                console.log('Navegando a: ventas');
-                onNavigate('ventas' as any);
-              }}
+              onClick={() => onNavigate('ventas' as any)}
               style={{
                 padding: '12px 24px',
                 backgroundColor: currentPage === 'ventas' ? 'white' : 'transparent',
@@ -175,10 +169,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
               Ventas del Día
             </button>
             <button
-              onClick={() => {
-                console.log('Navegando a: historico');
-                onNavigate('historico' as any);
-              }}
+              onClick={() => onNavigate('historico' as any)}
               style={{
                 padding: '12px 24px',
                 backgroundColor: currentPage === 'historico' ? 'white' : 'transparent',

@@ -10,6 +10,8 @@ import { HistoricoVentasPage } from './pages/HistoricoVentasPage';
 import ProductosBodegaPage from './pages/ProductosBodegaPage';
 import CategoriasPage from './pages/CategoriasPage';
 import MovimientosInventarioPage from './pages/MovimientosInventarioPage';
+import DashboardPage from './pages/DashboardPage';
+import ClientesAdminPage from './pages/ClientesAdminPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,10 +24,11 @@ const queryClient = new QueryClient({
 
 type POSPage = 'pos' | 'ventas' | 'historico';
 type BodegaPage = 'productos' | 'categorias' | 'movimientos';
+type AdminPage = 'dashboard' | 'productos' | 'categorias' | 'movimientos' | 'clientes' | 'ventas' | 'historico';
 
 function AppContent() {
   const { initAuth, user, isLoading } = useAuthStore();
-  const [currentPage, setCurrentPage] = useState<POSPage | BodegaPage>('pos');
+  const [currentPage, setCurrentPage] = useState<POSPage | BodegaPage | AdminPage>('pos');
   
   useEffect(() => {
     initAuth();
@@ -41,6 +44,9 @@ function AppContent() {
         case 'bodeguero':
           setCurrentPage('productos');
           break;
+        case 'administrador':
+          setCurrentPage('dashboard');
+          break;
         case 'cajero':
         case 'authenticated':
         default:
@@ -53,12 +59,35 @@ function AppContent() {
   const roleType = user?.role?.type?.toLowerCase();
   const isBodeguero = roleType === 'bodeguero';
   const isCajero = roleType === 'cajero' || roleType === 'authenticated';
+  const isAdministrador = roleType === 'administrador';
 
-  const handleNavigate = (page: POSPage | BodegaPage) => {
+  const handleNavigate = (page: POSPage | BodegaPage | AdminPage) => {
     setCurrentPage(page);
   };
 
   const renderPage = () => {
+    // Si es administrador, mostrar páginas admin completas
+    if (isAdministrador) {
+      switch (currentPage) {
+        case 'dashboard':
+          return <DashboardPage />;
+        case 'productos':
+          return <ProductosBodegaPage />;
+        case 'categorias':
+          return <CategoriasPage />;
+        case 'movimientos':
+          return <MovimientosInventarioPage />;
+        case 'clientes':
+          return <ClientesAdminPage />;
+        case 'ventas':
+          return <VentasDelDiaPage />;
+        case 'historico':
+          return <HistoricoVentasPage />;
+        default:
+          return <DashboardPage />;
+      }
+    }
+    
     // Si es bodeguero, mostrar páginas de bodega
     if (isBodeguero) {
       switch (currentPage) {

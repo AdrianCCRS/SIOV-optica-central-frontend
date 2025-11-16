@@ -51,4 +51,19 @@ export const clientesService = {
       ...(item.attributes || item),
     };
   },
+
+  // Actualizar un cliente existente
+  async actualizarCliente(id: number, data: Partial<Omit<Cliente, 'id'>>): Promise<Cliente> {
+    const response = await api.put(`/clientes/${id}`, { data });
+    const item = response.data.data || response.data;
+    return {
+      id: item.id,
+      ...(item.attributes || item),
+    };
+  },
+
+  // Eliminar un cliente
+  async eliminarCliente(id: number): Promise<void> {
+    await api.delete(`/clientes/${id}`);
+  },
 };

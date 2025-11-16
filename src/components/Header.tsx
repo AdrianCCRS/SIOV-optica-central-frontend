@@ -3,10 +3,11 @@ import StockAlerts from './StockAlerts';
 
 type POSPage = 'pos' | 'ventas' | 'historico';
 type BodegaPage = 'productos' | 'categorias' | 'movimientos';
+type AdminPage = 'dashboard' | 'productos' | 'categorias' | 'movimientos' | 'clientes' | 'ventas' | 'historico';
 
 interface HeaderProps {
-  currentPage: POSPage | BodegaPage;
-  onNavigate: (page: POSPage | BodegaPage) => void;
+  currentPage: POSPage | BodegaPage | AdminPage;
+  onNavigate: (page: POSPage | BodegaPage | AdminPage) => void;
 }
 
 export default function Header({ currentPage, onNavigate }: HeaderProps) {
@@ -16,10 +17,10 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
   const roleType = user?.role?.type?.toLowerCase();
   const isBodeguero = roleType === 'bodeguero';
   const isCajero = roleType === 'cajero' || roleType === 'authenticated';
-  const isAdmin = roleType === 'admin' || roleType === 'administrator';
-  
-  // Mostrar alertas de stock solo para bodeguero y admin
-  const showStockAlerts = isBodeguero || isAdmin;
+  const isAdministrador = roleType === 'administrador';
+  console.log(user);
+  // Mostrar alertas de stock solo para bodeguero y administrador
+  const showStockAlerts = isBodeguero || isAdministrador;
 
   const handleLogout = () => {
     if (window.confirm('¿Estás seguro de que deseas cerrar sesión?')) {
@@ -30,6 +31,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
 
   // Título según el rol
   const getTitle = () => {
+    if (isAdministrador) return 'Panel de Administración';
     if (isBodeguero) return 'Gestión de Bodega';
     if (isCajero) return 'Sistema de Ventas';
     return 'Sistema';
@@ -98,7 +100,116 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
         gap: '0',
         backgroundColor: 'rgba(0,0,0,0.1)',
       }}>
-        {isBodeguero ? (
+        {isAdministrador ? (
+          // Tabs para administrador
+          <>
+            <button
+              onClick={() => onNavigate('dashboard' as any)}
+              style={{
+                padding: '12px 20px',
+                backgroundColor: currentPage === 'dashboard' ? 'white' : 'transparent',
+                color: currentPage === 'dashboard' ? '#4CAF50' : 'white',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: 'bold',
+                borderBottom: currentPage === 'dashboard' ? '3px solid #4CAF50' : 'none',
+              }}
+            >
+              Dashboard
+            </button>
+            <button
+              onClick={() => onNavigate('productos' as any)}
+              style={{
+                padding: '12px 20px',
+                backgroundColor: currentPage === 'productos' ? 'white' : 'transparent',
+                color: currentPage === 'productos' ? '#4CAF50' : 'white',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: 'bold',
+                borderBottom: currentPage === 'productos' ? '3px solid #4CAF50' : 'none',
+              }}
+            >
+              Productos
+            </button>
+            <button
+              onClick={() => onNavigate('categorias' as any)}
+              style={{
+                padding: '12px 20px',
+                backgroundColor: currentPage === 'categorias' ? 'white' : 'transparent',
+                color: currentPage === 'categorias' ? '#4CAF50' : 'white',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: 'bold',
+                borderBottom: currentPage === 'categorias' ? '3px solid #4CAF50' : 'none',
+              }}
+            >
+              Categorías
+            </button>
+            <button
+              onClick={() => onNavigate('movimientos' as any)}
+              style={{
+                padding: '12px 20px',
+                backgroundColor: currentPage === 'movimientos' ? 'white' : 'transparent',
+                color: currentPage === 'movimientos' ? '#4CAF50' : 'white',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: 'bold',
+                borderBottom: currentPage === 'movimientos' ? '3px solid #4CAF50' : 'none',
+              }}
+            >
+              Inventario
+            </button>
+            <button
+              onClick={() => onNavigate('clientes' as any)}
+              style={{
+                padding: '12px 20px',
+                backgroundColor: currentPage === 'clientes' ? 'white' : 'transparent',
+                color: currentPage === 'clientes' ? '#4CAF50' : 'white',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: 'bold',
+                borderBottom: currentPage === 'clientes' ? '3px solid #4CAF50' : 'none',
+              }}
+            >
+              Clientes
+            </button>
+            <button
+              onClick={() => onNavigate('ventas' as any)}
+              style={{
+                padding: '12px 20px',
+                backgroundColor: currentPage === 'ventas' ? 'white' : 'transparent',
+                color: currentPage === 'ventas' ? '#4CAF50' : 'white',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: 'bold',
+                borderBottom: currentPage === 'ventas' ? '3px solid #4CAF50' : 'none',
+              }}
+            >
+              Ventas del Día
+            </button>
+            <button
+              onClick={() => onNavigate('historico' as any)}
+              style={{
+                padding: '12px 20px',
+                backgroundColor: currentPage === 'historico' ? 'white' : 'transparent',
+                color: currentPage === 'historico' ? '#4CAF50' : 'white',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: 'bold',
+                borderBottom: currentPage === 'historico' ? '3px solid #4CAF50' : 'none',
+              }}
+            >
+              Histórico
+            </button>
+          </>
+        ) : isBodeguero ? (
           // Tabs para bodeguero
           <>
             <button

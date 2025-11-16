@@ -1,4 +1,5 @@
 import ProductCard from './ProductCard';
+import LoadingSpinner from '../LoadingSpinner';
 
 interface Producto {
   id: number;
@@ -16,6 +17,10 @@ interface ProductGridProps {
 }
 
 export default function ProductGrid({ productos, isLoading, onSelectProduct }: ProductGridProps) {
+  if (isLoading) {
+    return <LoadingSpinner message="Cargando productos..." />;
+  }
+
   return (
     <div style={{
       display: 'grid',
@@ -26,16 +31,7 @@ export default function ProductGrid({ productos, isLoading, onSelectProduct }: P
       paddingRight: '8px',
       paddingTop: '8px',
     }}>
-      {isLoading ? (
-        <div style={{
-          gridColumn: '1 / -1',
-          textAlign: 'center',
-          padding: '40px',
-          color: '#718096',
-        }}>
-          Cargando productos...
-        </div>
-      ) : productos.length === 0 ? (
+      {productos.length === 0 ? (
         <div style={{
           gridColumn: '1 / -1',
           textAlign: 'center',

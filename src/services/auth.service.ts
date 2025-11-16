@@ -12,6 +12,12 @@ export interface AuthUser {
   blocked: boolean;
   nombres?: string;
   apellidos?: string;
+  role?: {
+    id: number;
+    name: string;
+    description: string;
+    type: string;
+  };
 }
 
 export interface AuthResponse {
@@ -27,15 +33,33 @@ export const authService = {
     // Guardar token en localStorage
     if (response.data.jwt) {
       localStorage.setItem('jwt_token', response.data.jwt);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      
+      // Obtener usuario con rol poblado
+      try {
+        const userWithRole = await this.me();
+        localStorage.setItem('user', JSON.stringify(userWithRole));
+        return {
+          jwt: response.data.jwt,
+          user: userWithRole
+        };
+      } catch (error) {
+        // Si falla, guardar el usuario sin rol
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        return response.data;
+      }
     }
     
     return response.data;
   },
 
-  // Obtener usuario actual
+  // Obtener usuario actual con rol
   async me(): Promise<AuthUser> {
-    const response = await authApi.get('/api/users/me');
+    const token = localStorage.getItem('jwt_token');
+    const response = await authApi.get('/api/users/me?populate=role', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     return response.data;
   },
 

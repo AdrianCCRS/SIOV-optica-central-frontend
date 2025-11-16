@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ventasService } from '../services/ventas.service';
 import { formatCurrency } from '../utils/format';
 import DetalleFacturaModal from '../components/DetalleFacturaModal';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function VentasDelDiaPage() {
   const [facturaSeleccionada, setFacturaSeleccionada] = useState<{ id: number; numero: string } | null>(null);
@@ -14,11 +15,7 @@ export default function VentasDelDiaPage() {
   });
 
   if (isLoading) {
-    return (
-      <div style={{ padding: '20px', textAlign: 'center' }}>
-        <p>Cargando ventas del día...</p>
-      </div>
-    );
+    return <LoadingSpinner message="Cargando ventas del día..." />;
   }
 
   if (error) {

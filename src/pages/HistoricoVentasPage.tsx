@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ventasService, type BuscarFacturasParams } from '../services/ventas.service';
 import { formatCurrency } from '../utils/format';
 import DetalleFacturaModal from '../components/DetalleFacturaModal';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export const HistoricoVentasPage = () => {
   const [facturaSeleccionada, setFacturaSeleccionada] = useState<number | null>(null);
@@ -232,20 +233,7 @@ export const HistoricoVentasPage = () => {
         </div>
 
         {/* Resultados */}
-        {isLoading && (
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '12px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-            padding: '64px',
-            textAlign: 'center',
-            border: '1px solid #e2e8f0',
-          }}>
-            <p style={{ fontSize: '15px', color: '#718096', fontWeight: '500' }}>
-              Buscando facturas...
-            </p>
-          </div>
-        )}
+        {isLoading && <LoadingSpinner message="Buscando facturas..." />}
 
         {error && (
           <div style={{

@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { productosService, type Producto } from '../services/productos.service';
 import { categoriasService, type CategoriaProducto } from '../services/categorias.service';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function ProductosBodegaPage() {
+  const queryClient = useQueryClient();
   const [productos, setProductos] = useState<Producto[]>([]);
   const [categorias, setCategorias] = useState<CategoriaProducto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +66,9 @@ export default function ProductosBodegaPage() {
       } else {
         await productosService.create(data);
       }
+      
+      // Invalidar la caché de productos con bajo stock para actualizar las alertas en tiempo real
+      queryClient.invalidateQueries({ queryKey: ['productos-bajo-stock'] });
       
       setShowModal(false);
       resetForm();

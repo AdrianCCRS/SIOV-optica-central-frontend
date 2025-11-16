@@ -164,5 +164,28 @@ export const productosService = {
   // Eliminar producto
   async delete(id: number): Promise<void> {
     await api.delete(`/productos/${id}`);
+  },
+
+  // Obtener productos con bajo stock (stock_actual <= stock_minimo)
+  async getProductosBajoStock(): Promise<Producto[]> {
+    const response = await api.get('/productos?filters[activo][$eq]=true&populate=categoria');
+    const items = Array.isArray(response.data) ? response.data : response.data.data || [];
+    return items
+      .map((item: any) => ({
+        id: item.id,
+        referencia: item.referencia,
+        nombre: item.nombre,
+        descripcion: item.descripcion,
+        precio_unitario: parseFloat(item.precio_unitario) || 0,
+        porcentaje_iva: parseFloat(item.porcentaje_iva) || 0,
+        stock_actual: parseInt(item.stock_actual) || 0,
+        stock_minimo: parseInt(item.stock_minimo) || 0,
+        activo: item.activo,
+        categoria: item.categoria ? {
+          id: item.categoria.id,
+          nombre: item.categoria.nombre,
+        } : undefined,
+      }))
+      .filter((producto: Producto) => producto.stock_actual <= producto.stock_minimo);
   }
 };

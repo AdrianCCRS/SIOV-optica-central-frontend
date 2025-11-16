@@ -1,4 +1,5 @@
 import { useAuthStore } from '../store/authStore';
+import StockAlerts from './StockAlerts';
 
 type POSPage = 'pos' | 'ventas' | 'historico';
 type BodegaPage = 'productos' | 'categorias' | 'movimientos';
@@ -15,6 +16,10 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
   const roleType = user?.role?.type?.toLowerCase();
   const isBodeguero = roleType === 'bodeguero';
   const isCajero = roleType === 'cajero' || roleType === 'authenticated';
+  const isAdmin = roleType === 'admin' || roleType === 'administrator';
+  
+  // Mostrar alertas de stock solo para bodeguero y admin
+  const showStockAlerts = isBodeguero || isAdmin;
 
   const handleLogout = () => {
     if (window.confirm('¿Estás seguro de que deseas cerrar sesión?')) {
@@ -61,6 +66,13 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
               {user?.role?.name || user?.username || user?.email}
             </div>
           </div>
+          
+          {/* Alertas de stock bajo para bodeguero y admin */}
+          {showStockAlerts && (
+            <StockAlerts 
+              onViewDetails={() => onNavigate('productos' as any)} 
+            />
+          )}
           
           <button
             onClick={handleLogout}

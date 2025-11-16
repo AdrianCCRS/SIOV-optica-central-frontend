@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { inventarioService, type MovimientoInventario, type CreateMovimientoData } from '../services/inventario.service';
 import { productosService, type Producto } from '../services/productos.service';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function MovimientosInventarioPage() {
+  const queryClient = useQueryClient();
   const [movimientos, setMovimientos] = useState<MovimientoInventario[]>([]);
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,6 +101,9 @@ export default function MovimientosInventarioPage() {
       };
 
       await inventarioService.create(data);
+      
+      // Invalidar la caché de productos con bajo stock para actualizar las alertas en tiempo real
+      queryClient.invalidateQueries({ queryKey: ['productos-bajo-stock'] });
       
       setShowModal(false);
       resetForm();

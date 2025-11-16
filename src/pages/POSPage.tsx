@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { productosService } from '../services/productos.service';
 import { clientesService } from '../services/clientes.service';
 import { ventasService } from '../services/ventas.service';
@@ -11,6 +11,7 @@ import ProductGrid from '../components/pos/ProductGrid';
 import CartPanel from '../components/pos/CartPanel';
 
 export default function POSPage() {
+  const queryClient = useQueryClient();
   const [busquedaProducto, setBusquedaProducto] = useState('');
   const [clienteSeleccionado, setClienteSeleccionado] = useState<number | null>(null);
   const [metodoPago, setMetodoPago] = useState<'efectivo' | 'tarjeta' | 'transferencia'>('efectivo');
@@ -39,6 +40,8 @@ export default function POSPage() {
       alert(`¡Venta registrada exitosamente!\nFactura: ${data.numero_factura}\nTotal: ${formatCurrency(data.total)}`);
       limpiarCarrito();
       setClienteSeleccionado(null);
+      // Invalidar la caché de productos con bajo stock ya que la venta reduce el stock
+      queryClient.invalidateQueries({ queryKey: ['productos-bajo-stock'] });
     },
     onError: (error: any) => {
       alert(`Error al registrar venta: ${error.response?.data?.error?.message || error.message}`);

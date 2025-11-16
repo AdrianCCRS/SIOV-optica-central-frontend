@@ -64,11 +64,17 @@ export const inventarioService = {
 
     const response = await api.get<MovimientosListResponse>(url);
     return response.data.data.map(item => ({
-      ...item,
+      id: item.id,
+      tipo: item.tipo,
+      cantidad: item.cantidad || 0,
+      motivo: item.motivo,
+      fecha: item.fecha,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
       producto: item.producto ? {
         id: item.producto.id,
-        nombre: item.producto.nombre,
-        codigo: item.producto.codigo
+        nombre: item.producto.nombre || 'Sin nombre',
+        codigo: item.producto.codigo || (item.producto as any).referencia || ''
       } : undefined
     }));
   },

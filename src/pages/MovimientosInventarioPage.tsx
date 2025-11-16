@@ -103,7 +103,8 @@ export default function MovimientosInventarioPage() {
     resetForm();
   };
 
-  const getTipoColor = (tipo: string) => {
+  const getTipoColor = (tipo: string | undefined) => {
+    if (!tipo) return '#999';
     switch (tipo) {
       case 'entrada': return '#4CAF50';
       case 'salida': return '#f44336';
@@ -112,7 +113,8 @@ export default function MovimientosInventarioPage() {
     }
   };
 
-  const getTipoLabel = (tipo: string) => {
+  const getTipoLabel = (tipo: string | undefined) => {
+    if (!tipo) return '-';
     switch (tipo) {
       case 'entrada': return 'ENTRADA';
       case 'salida': return 'SALIDA';

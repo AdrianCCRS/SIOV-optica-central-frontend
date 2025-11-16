@@ -1,8 +1,8 @@
 import { useAuthStore } from '../store/authStore';
 
 interface HeaderProps {
-  currentPage: 'pos' | 'ventas';
-  onNavigate: (page: 'pos' | 'ventas') => void;
+  currentPage: 'pos' | 'ventas' | 'historico';
+  onNavigate: (page: 'pos' | 'ventas' | 'historico') => void;
 }
 
 export default function Header({ currentPage, onNavigate }: HeaderProps) {
@@ -98,6 +98,21 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
           }}
         >
           Ventas del Día
+        </button>
+        <button
+          onClick={() => onNavigate('historico')}
+          style={{
+            padding: '12px 24px',
+            backgroundColor: currentPage === 'historico' ? 'white' : 'transparent',
+            color: currentPage === 'historico' ? '#4CAF50' : 'white',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            borderBottom: currentPage === 'historico' ? '3px solid #4CAF50' : 'none',
+          }}
+        >
+          Histórico de Ventas
         </button>
       </div>
     </header>

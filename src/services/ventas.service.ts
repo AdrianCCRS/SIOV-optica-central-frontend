@@ -32,6 +32,21 @@ export interface VentasDelDiaResponse {
   facturas: VentaResponse[];
 }
 
+export interface BuscarFacturasParams {
+  fechaInicio?: string;
+  fechaFin?: string;
+  numeroFactura?: string;
+  clienteId?: number;
+}
+
+export interface BuscarFacturasResponse {
+  facturas: VentaResponse[];
+  resumen: {
+    cantidad: number;
+    total_ventas: number;
+  };
+}
+
 export const ventasService = {
   // Registrar una nueva venta
   async registrarVenta(data: RegistrarVentaData): Promise<any> {
@@ -49,5 +64,11 @@ export const ventasService = {
   async obtenerFactura(id: number): Promise<VentaResponse> {
     const response = await api.get(`/facturas/${id}`);
     return response.data.data;
+  },
+
+  // Buscar facturas con filtros
+  async buscarFacturas(params: BuscarFacturasParams): Promise<BuscarFacturasResponse> {
+    const response = await api.get('/ventas/buscar', { params });
+    return response.data;
   },
 };

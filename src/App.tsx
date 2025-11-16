@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Header from './components/Header';
 import POSPage from './pages/POSPage';
 import VentasDelDiaPage from './pages/VentasDelDiaPage';
+import { HistoricoVentasPage } from './pages/HistoricoVentasPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,18 +18,31 @@ const queryClient = new QueryClient({
 
 function AppContent() {
   const { initAuth } = useAuthStore();
-  const [currentPage, setCurrentPage] = useState<'pos' | 'ventas'>('pos');
+  const [currentPage, setCurrentPage] = useState<'pos' | 'ventas' | 'historico'>('pos');
 
   useEffect(() => {
     initAuth();
   }, [initAuth]);
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'pos':
+        return <POSPage />;
+      case 'ventas':
+        return <VentasDelDiaPage />;
+      case 'historico':
+        return <HistoricoVentasPage />;
+      default:
+        return <POSPage />;
+    }
+  };
 
   return (
     <ProtectedRoute>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
         <Header currentPage={currentPage} onNavigate={setCurrentPage} />
         <div style={{ flex: 1, overflow: 'auto' }}>
-          {currentPage === 'pos' ? <POSPage /> : <VentasDelDiaPage />}
+          {renderPage()}
         </div>
       </div>
     </ProtectedRoute>

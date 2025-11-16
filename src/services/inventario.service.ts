@@ -2,14 +2,15 @@ import api from './api';
 
 export interface MovimientoInventario {
   id: number;
-  tipo: 'entrada' | 'salida' | 'ajuste';
+  tipo_movimiento: 'Entrada' | 'Salida' | 'Ajuste Inventario' | 'Devolución';
   cantidad: number;
-  motivo?: string;
+  motivo: string;
   fecha: string;
+  stock_resultante: number;
   producto?: {
     id: number;
     nombre: string;
-    codigo: string;
+    referencia?: string;
   };
   createdAt?: string;
   updatedAt?: string;
@@ -32,25 +33,26 @@ export interface MovimientosListResponse {
 }
 
 export interface CreateMovimientoData {
-  tipo: 'entrada' | 'salida' | 'ajuste';
+  tipo_movimiento: 'Entrada' | 'Salida' | 'Ajuste Inventario' | 'Devolución';
   cantidad: number;
-  motivo?: string;
+  motivo: string;
   fecha: string;
+  stock_resultante: number;
   producto: number; // ID del producto
 }
 
 export const inventarioService = {
   // Obtener todos los movimientos con filtros opcionales
   async getAll(filters?: {
-    tipo?: 'entrada' | 'salida' | 'ajuste';
+    tipo_movimiento?: 'Entrada' | 'Salida' | 'Ajuste Inventario' | 'Devolución';
     productoId?: number;
     fechaInicio?: string;
     fechaFin?: string;
   }): Promise<MovimientoInventario[]> {
     let url = '/movimiento-inventarios?populate=producto&sort=fecha:desc';
     
-    if (filters?.tipo) {
-      url += `&filters[tipo][$eq]=${filters.tipo}`;
+    if (filters?.tipo_movimiento) {
+      url += `&filters[tipo_movimiento][$eq]=${filters.tipo_movimiento}`;
     }
     if (filters?.productoId) {
       url += `&filters[producto][id][$eq]=${filters.productoId}`;
@@ -65,16 +67,17 @@ export const inventarioService = {
     const response = await api.get<MovimientosListResponse>(url);
     return response.data.data.map(item => ({
       id: item.id,
-      tipo: item.tipo,
+      tipo_movimiento: item.tipo_movimiento,
       cantidad: item.cantidad || 0,
       motivo: item.motivo,
       fecha: item.fecha,
+      stock_resultante: item.stock_resultante,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
       producto: item.producto ? {
         id: item.producto.id,
         nombre: item.producto.nombre || 'Sin nombre',
-        codigo: item.producto.codigo || (item.producto as any).referencia || ''
+        referencia: item.producto.referencia || ''
       } : undefined
     }));
   },

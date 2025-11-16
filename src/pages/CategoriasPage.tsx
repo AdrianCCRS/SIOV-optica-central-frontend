@@ -56,17 +56,6 @@ export default function CategoriasPage() {
     setShowModal(true);
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Estás seguro de eliminar esta categoría?')) return;
-    
-    try {
-      await categoriasService.delete(id);
-      loadCategorias();
-    } catch (error) {
-      alert('Error al eliminar la categoría. Puede que tenga productos asociados.');
-    }
-  };
-
   const handleCloseModal = () => {
     setShowModal(false);
     setFormData({ nombre: '', descripcion: '' });
@@ -124,25 +113,10 @@ export default function CategoriasPage() {
                       border: 'none',
                       borderRadius: '4px',
                       cursor: 'pointer',
-                      marginRight: '8px',
                       fontSize: '12px'
                     }}
                   >
                     Editar
-                  </button>
-                  <button
-                    onClick={() => handleDelete(categoria.id)}
-                    style={{
-                      padding: '6px 12px',
-                      backgroundColor: '#f44336',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      fontSize: '12px'
-                    }}
-                  >
-                    Eliminar
                   </button>
                 </td>
               </tr>

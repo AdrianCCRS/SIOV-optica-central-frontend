@@ -89,17 +89,6 @@ export default function ProductosBodegaPage() {
     setShowModal(true);
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Estás seguro de eliminar este producto?')) return;
-    
-    try {
-      await productosService.delete(id);
-      loadData();
-    } catch (error) {
-      alert('Error al eliminar el producto');
-    }
-  };
-
   const resetForm = () => {
     setFormData({
       nombre: '',
@@ -260,20 +249,6 @@ export default function ProductosBodegaPage() {
                       }}
                     >
                       Editar
-                    </button>
-                    <button
-                      onClick={() => handleDelete(producto.id)}
-                      style={{
-                        padding: '6px 12px',
-                        backgroundColor: '#f44336',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px'
-                      }}
-                    >
-                      Eliminar
                     </button>
                   </td>
                 </tr>

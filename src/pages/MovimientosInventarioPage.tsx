@@ -8,16 +8,16 @@ export default function MovimientosInventarioPage() {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [filterTipo, setFilterTipo] = useState<'' | 'entrada' | 'salida' | 'ajuste'>('');
+  const [filterTipo, setFilterTipo] = useState<'' | 'Entrada' | 'Salida' | 'Ajuste Inventario' | 'Devolución'>('');
   const [filterProducto, setFilterProducto] = useState<number | ''>('');
   const [formData, setFormData] = useState<{
-    tipo: 'entrada' | 'salida' | 'ajuste';
+    tipo_movimiento: 'Entrada' | 'Salida' | 'Ajuste Inventario' | 'Devolución';
     cantidad: string;
     motivo: string;
     fecha: string;
     producto: string;
   }>({
-    tipo: 'entrada',
+    tipo_movimiento: 'Entrada',
     cantidad: '',
     motivo: '',
     fecha: new Date().toISOString().split('T')[0],
@@ -32,7 +32,7 @@ export default function MovimientosInventarioPage() {
     try {
       setLoading(true);
       const filters: any = {};
-      if (filterTipo) filters.tipo = filterTipo;
+      if (filterTipo) filters.tipo_movimiento = filterTipo;
       if (filterProducto) filters.productoId = filterProducto;
       
       const [movimientosData, productosData] = await Promise.all([
@@ -57,12 +57,44 @@ export default function MovimientosInventarioPage() {
       return;
     }
 
+    if (!formData.motivo.trim()) {
+      alert('Debe ingresar un motivo para el movimiento');
+      return;
+    }
+
     try {
+      // Obtener el producto seleccionado para conocer su stock actual
+      const producto = productos.find(p => p.id === parseInt(formData.producto));
+      if (!producto) {
+        alert('Producto no encontrado');
+        return;
+      }
+
+      // Calcular el stock resultante según el tipo de movimiento
+      const cantidad = parseInt(formData.cantidad);
+      let stockResultante = producto.stock_actual || 0;
+      
+      if (formData.tipo_movimiento === 'Entrada') {
+        stockResultante += cantidad;
+      } else if (formData.tipo_movimiento === 'Salida') {
+        stockResultante -= cantidad;
+        if (stockResultante < 0) {
+          alert('Stock insuficiente para realizar esta salida');
+          return;
+        }
+      } else if (formData.tipo_movimiento === 'Ajuste Inventario') {
+        // En ajuste, la cantidad es el nuevo stock total
+        stockResultante = cantidad;
+      } else if (formData.tipo_movimiento === 'Devolución') {
+        stockResultante += cantidad;
+      }
+
       const data: CreateMovimientoData = {
-        tipo: formData.tipo,
-        cantidad: parseInt(formData.cantidad),
-        motivo: formData.motivo || undefined,
+        tipo_movimiento: formData.tipo_movimiento,
+        cantidad: cantidad,
+        motivo: formData.motivo,
         fecha: formData.fecha,
+        stock_resultante: stockResultante,
         producto: parseInt(formData.producto)
       };
 
@@ -77,20 +109,9 @@ export default function MovimientosInventarioPage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Estás seguro de eliminar este movimiento?')) return;
-    
-    try {
-      await inventarioService.delete(id);
-      loadData();
-    } catch (error) {
-      alert('Error al eliminar el movimiento');
-    }
-  };
-
   const resetForm = () => {
     setFormData({
-      tipo: 'entrada',
+      tipo_movimiento: 'Entrada',
       cantidad: '',
       motivo: '',
       fecha: new Date().toISOString().split('T')[0],
@@ -106,9 +127,10 @@ export default function MovimientosInventarioPage() {
   const getTipoColor = (tipo: string | undefined) => {
     if (!tipo) return '#999';
     switch (tipo) {
-      case 'entrada': return '#4CAF50';
-      case 'salida': return '#f44336';
-      case 'ajuste': return '#FF9800';
+      case 'Entrada': return '#4CAF50';
+      case 'Salida': return '#f44336';
+      case 'Ajuste Inventario': return '#FF9800';
+      case 'Devolución': return '#2196F3';
       default: return '#999';
     }
   };
@@ -116,9 +138,10 @@ export default function MovimientosInventarioPage() {
   const getTipoLabel = (tipo: string | undefined) => {
     if (!tipo) return '-';
     switch (tipo) {
-      case 'entrada': return 'ENTRADA';
-      case 'salida': return 'SALIDA';
-      case 'ajuste': return 'AJUSTE';
+      case 'Entrada': return 'ENTRADA';
+      case 'Salida': return 'SALIDA';
+      case 'Ajuste Inventario': return 'AJUSTE';
+      case 'Devolución': return 'DEVOLUCIÓN';
       default: return tipo.toUpperCase();
     }
   };
@@ -162,9 +185,10 @@ export default function MovimientosInventarioPage() {
           }}
         >
           <option value="">Todos los tipos</option>
-          <option value="entrada">Entrada</option>
-          <option value="salida">Salida</option>
-          <option value="ajuste">Ajuste</option>
+          <option value="Entrada">Entrada</option>
+          <option value="Salida">Salida</option>
+          <option value="Ajuste Inventario">Ajuste Inventario</option>
+          <option value="Devolución">Devolución</option>
         </select>
         
         <select
@@ -195,9 +219,8 @@ export default function MovimientosInventarioPage() {
               <th style={{ padding: '12px', textAlign: 'left' }}>Fecha</th>
               <th style={{ padding: '12px', textAlign: 'left' }}>Producto</th>
               <th style={{ padding: '12px', textAlign: 'center' }}>Tipo</th>
-              <th style={{ padding: '12px', textAlign: 'right' }}>Cantidad</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>Cantidad</th>
               <th style={{ padding: '12px', textAlign: 'left' }}>Motivo</th>
-              <th style={{ padding: '12px', textAlign: 'center' }}>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -211,7 +234,7 @@ export default function MovimientosInventarioPage() {
                     <>
                       <div>{movimiento.producto.nombre}</div>
                       <div style={{ fontSize: '12px', color: '#666', fontFamily: 'monospace' }}>
-                        {movimiento.producto.codigo}
+                        {movimiento.producto.referencia}
                       </div>
                     </>
                   ) : '-'}
@@ -222,40 +245,25 @@ export default function MovimientosInventarioPage() {
                     borderRadius: '4px',
                     fontSize: '12px',
                     fontWeight: 'bold',
-                    backgroundColor: getTipoColor(movimiento.tipo),
+                    backgroundColor: getTipoColor(movimiento.tipo_movimiento),
                     color: 'white'
                   }}>
-                    {getTipoLabel(movimiento.tipo)}
+                    {getTipoLabel(movimiento.tipo_movimiento)}
                   </span>
                 </td>
                 <td style={{ 
                   padding: '12px', 
                   textAlign: 'right',
                   fontWeight: 'bold',
-                  color: movimiento.tipo === 'entrada' ? '#4CAF50' : 
-                         movimiento.tipo === 'salida' ? '#f44336' : '#FF9800'
+                  color: movimiento.tipo_movimiento === 'Entrada' || movimiento.tipo_movimiento === 'Devolución' ? '#4CAF50' : 
+                         movimiento.tipo_movimiento === 'Salida' ? '#f44336' : '#FF9800'
                 }}>
-                  {movimiento.tipo === 'entrada' ? '+' : movimiento.tipo === 'salida' ? '-' : '±'}
+                  {movimiento.tipo_movimiento === 'Entrada' || movimiento.tipo_movimiento === 'Devolución' ? '+' : 
+                   movimiento.tipo_movimiento === 'Salida' ? '-' : ''}
                   {movimiento.cantidad}
                 </td>
                 <td style={{ padding: '12px' }}>
                   {movimiento.motivo || '-'}
-                </td>
-                <td style={{ padding: '12px', textAlign: 'center' }}>
-                  <button
-                    onClick={() => handleDelete(movimiento.id)}
-                    style={{
-                      padding: '6px 12px',
-                      backgroundColor: '#f44336',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      fontSize: '12px'
-                    }}
-                  >
-                    Eliminar
-                  </button>
                 </td>
               </tr>
             ))}
@@ -330,8 +338,8 @@ export default function MovimientosInventarioPage() {
                     Tipo *
                   </label>
                   <select
-                    value={formData.tipo}
-                    onChange={(e) => setFormData({ ...formData, tipo: e.target.value as any })}
+                    value={formData.tipo_movimiento}
+                    onChange={(e) => setFormData({ ...formData, tipo_movimiento: e.target.value as any })}
                     required
                     style={{
                       width: '100%',
@@ -341,9 +349,10 @@ export default function MovimientosInventarioPage() {
                       fontSize: '14px'
                     }}
                   >
-                    <option value="entrada">Entrada</option>
-                    <option value="salida">Salida</option>
-                    <option value="ajuste">Ajuste</option>
+                    <option value="Entrada">Entrada</option>
+                    <option value="Salida">Salida</option>
+                    <option value="Ajuste Inventario">Ajuste Inventario</option>
+                    <option value="Devolución">Devolución</option>
                   </select>
                 </div>
 
@@ -389,12 +398,13 @@ export default function MovimientosInventarioPage() {
 
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                  Motivo
+                  Motivo *
                 </label>
                 <textarea
                   value={formData.motivo}
                   onChange={(e) => setFormData({ ...formData, motivo: e.target.value })}
                   rows={3}
+                  required
                   placeholder="Descripción del movimiento..."
                   style={{
                     width: '100%',

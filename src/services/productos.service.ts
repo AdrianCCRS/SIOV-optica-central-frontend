@@ -33,68 +33,61 @@ export const productosService = {
   async obtenerProductosActivos(): Promise<Producto[]> {
     const response = await api.get('/productos?filters[activo][$eq]=true&populate=categoria');
     const items = Array.isArray(response.data) ? response.data : response.data.data || [];
-    return items.map((item: any) => {
-      const attrs = item.attributes || item;
-      return {
-        id: item.id,
-        referencia: attrs.referencia,
-        nombre: attrs.nombre,
-        descripcion: attrs.descripcion,
-        precio_unitario: parseFloat(attrs.precio_unitario) || 0,
-        porcentaje_iva: parseFloat(attrs.porcentaje_iva) || 0,
-        stock_actual: parseInt(attrs.stock_actual) || 0,
-        stock_minimo: parseInt(attrs.stock_minimo) || 0,
-        activo: attrs.activo,
-        categoria: attrs.categoria?.data ? {
-          id: attrs.categoria.data.id,
-          nombre: attrs.categoria.data.attributes?.nombre || attrs.categoria.data.nombre,
-        } : undefined,
-      };
-    });
+    return items.map((item: any) => ({
+      id: item.id,
+      referencia: item.referencia,
+      nombre: item.nombre,
+      descripcion: item.descripcion,
+      precio_unitario: parseFloat(item.precio_unitario) || 0,
+      porcentaje_iva: parseFloat(item.porcentaje_iva) || 0,
+      stock_actual: parseInt(item.stock_actual) || 0,
+      stock_minimo: parseInt(item.stock_minimo) || 0,
+      activo: item.activo,
+      categoria: item.categoria ? {
+        id: item.categoria.id,
+        nombre: item.categoria.nombre,
+      } : undefined,
+    }));
   },
 
   // Buscar productos por referencia o nombre
   async buscarProductos(query: string): Promise<Producto[]> {
     const response = await api.get(`/productos?filters[$or][0][referencia][$containsi]=${query}&filters[$or][1][nombre][$containsi]=${query}&filters[activo][$eq]=true&populate=categoria`);
     const items = Array.isArray(response.data) ? response.data : response.data.data || [];
-    return items.map((item: any) => {
-      const attrs = item.attributes || item;
-      return {
-        id: item.id,
-        referencia: attrs.referencia,
-        nombre: attrs.nombre,
-        descripcion: attrs.descripcion,
-        precio_unitario: parseFloat(attrs.precio_unitario) || 0,
-        porcentaje_iva: parseFloat(attrs.porcentaje_iva) || 0,
-        stock_actual: parseInt(attrs.stock_actual) || 0,
-        stock_minimo: parseInt(attrs.stock_minimo) || 0,
-        activo: attrs.activo,
-        categoria: attrs.categoria?.data ? {
-          id: attrs.categoria.data.id,
-          nombre: attrs.categoria.data.attributes?.nombre || attrs.categoria.data.nombre,
-        } : undefined,
-      };
-    });
+    return items.map((item: any) => ({
+      id: item.id,
+      referencia: item.referencia,
+      nombre: item.nombre,
+      descripcion: item.descripcion,
+      precio_unitario: parseFloat(item.precio_unitario) || 0,
+      porcentaje_iva: parseFloat(item.porcentaje_iva) || 0,
+      stock_actual: parseInt(item.stock_actual) || 0,
+      stock_minimo: parseInt(item.stock_minimo) || 0,
+      activo: item.activo,
+      categoria: item.categoria ? {
+        id: item.categoria.id,
+        nombre: item.categoria.nombre,
+      } : undefined,
+    }));
   },
 
   // Obtener un producto por ID
   async obtenerProducto(id: number): Promise<Producto> {
     const response = await api.get(`/productos/${id}?populate=categoria`);
     const item = response.data.data || response.data;
-    const attrs = item.attributes || item;
     return {
       id: item.id,
-      referencia: attrs.referencia,
-      nombre: attrs.nombre,
-      descripcion: attrs.descripcion,
-      precio_unitario: parseFloat(attrs.precio_unitario) || 0,
-      porcentaje_iva: parseFloat(attrs.porcentaje_iva) || 0,
-      stock_actual: parseInt(attrs.stock_actual) || 0,
-      stock_minimo: parseInt(attrs.stock_minimo) || 0,
-      activo: attrs.activo,
-      categoria: attrs.categoria?.data ? {
-        id: attrs.categoria.data.id,
-        nombre: attrs.categoria.data.attributes?.nombre || attrs.categoria.data.nombre,
+      referencia: item.referencia,
+      nombre: item.nombre,
+      descripcion: item.descripcion,
+      precio_unitario: parseFloat(item.precio_unitario) || 0,
+      porcentaje_iva: parseFloat(item.porcentaje_iva) || 0,
+      stock_actual: parseInt(item.stock_actual) || 0,
+      stock_minimo: parseInt(item.stock_minimo) || 0,
+      activo: item.activo,
+      categoria: item.categoria ? {
+        id: item.categoria.id,
+        nombre: item.categoria.nombre,
       } : undefined,
     };
   },
@@ -103,24 +96,21 @@ export const productosService = {
   async getAll(): Promise<Producto[]> {
     const response = await api.get('/productos?populate=categoria');
     const items = Array.isArray(response.data) ? response.data : response.data.data || [];
-    return items.map((item: any) => {
-      const attrs = item.attributes || item;
-      return {
-        id: item.id,
-        referencia: attrs.referencia,
-        nombre: attrs.nombre,
-        descripcion: attrs.descripcion,
-        precio_unitario: parseFloat(attrs.precio_unitario) || 0,
-        porcentaje_iva: parseFloat(attrs.porcentaje_iva) || 0,
-        stock_actual: parseInt(attrs.stock_actual) || 0,
-        stock_minimo: parseInt(attrs.stock_minimo) || 0,
-        activo: attrs.activo,
-        categoria: attrs.categoria?.data ? {
-          id: attrs.categoria.data.id,
-          nombre: attrs.categoria.data.attributes?.nombre || attrs.categoria.data.nombre,
-        } : undefined,
-      };
-    });
+    return items.map((item: any) => ({
+      id: item.id,
+      referencia: item.referencia,
+      nombre: item.nombre,
+      descripcion: item.descripcion,
+      precio_unitario: parseFloat(item.precio_unitario) || 0,
+      porcentaje_iva: parseFloat(item.porcentaje_iva) || 0,
+      stock_actual: parseInt(item.stock_actual) || 0,
+      stock_minimo: parseInt(item.stock_minimo) || 0,
+      activo: item.activo,
+      categoria: item.categoria ? {
+        id: item.categoria.id,
+        nombre: item.categoria.nombre,
+      } : undefined,
+    }));
   },
 
   // Crear nuevo producto
@@ -133,20 +123,19 @@ export const productosService = {
       }
     });
     const item = response.data.data || response.data;
-    const attrs = item.attributes || item;
     return {
       id: item.id,
-      referencia: attrs.referencia,
-      nombre: attrs.nombre,
-      descripcion: attrs.descripcion,
-      precio_unitario: parseFloat(attrs.precio_unitario) || 0,
-      porcentaje_iva: parseFloat(attrs.porcentaje_iva) || 0,
-      stock_actual: parseInt(attrs.stock_actual) || 0,
-      stock_minimo: parseInt(attrs.stock_minimo) || 0,
-      activo: attrs.activo,
-      categoria: attrs.categoria?.data ? {
-        id: attrs.categoria.data.id,
-        nombre: attrs.categoria.data.attributes?.nombre || attrs.categoria.data.nombre,
+      referencia: item.referencia,
+      nombre: item.nombre,
+      descripcion: item.descripcion,
+      precio_unitario: parseFloat(item.precio_unitario) || 0,
+      porcentaje_iva: parseFloat(item.porcentaje_iva) || 0,
+      stock_actual: parseInt(item.stock_actual) || 0,
+      stock_minimo: parseInt(item.stock_minimo) || 0,
+      activo: item.activo,
+      categoria: item.categoria ? {
+        id: item.categoria.id,
+        nombre: item.categoria.nombre,
       } : undefined,
     };
   },
@@ -155,20 +144,19 @@ export const productosService = {
   async update(id: number, data: Partial<CreateProductoData>): Promise<Producto> {
     const response = await api.put(`/productos/${id}`, { data });
     const item = response.data.data || response.data;
-    const attrs = item.attributes || item;
     return {
       id: item.id,
-      referencia: attrs.referencia,
-      nombre: attrs.nombre,
-      descripcion: attrs.descripcion,
-      precio_unitario: parseFloat(attrs.precio_unitario) || 0,
-      porcentaje_iva: parseFloat(attrs.porcentaje_iva) || 0,
-      stock_actual: parseInt(attrs.stock_actual) || 0,
-      stock_minimo: parseInt(attrs.stock_minimo) || 0,
-      activo: attrs.activo,
-      categoria: attrs.categoria?.data ? {
-        id: attrs.categoria.data.id,
-        nombre: attrs.categoria.data.attributes?.nombre || attrs.categoria.data.nombre,
+      referencia: item.referencia,
+      nombre: item.nombre,
+      descripcion: item.descripcion,
+      precio_unitario: parseFloat(item.precio_unitario) || 0,
+      porcentaje_iva: parseFloat(item.porcentaje_iva) || 0,
+      stock_actual: parseInt(item.stock_actual) || 0,
+      stock_minimo: parseInt(item.stock_minimo) || 0,
+      activo: item.activo,
+      categoria: item.categoria ? {
+        id: item.categoria.id,
+        nombre: item.categoria.nombre,
       } : undefined,
     };
   },

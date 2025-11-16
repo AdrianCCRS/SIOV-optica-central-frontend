@@ -16,17 +16,11 @@ export interface MovimientoInventario {
 }
 
 export interface MovimientoResponse {
-  data: {
-    id: number;
-    attributes: Omit<MovimientoInventario, 'id'>;
-  };
+  data: MovimientoInventario;
 }
 
 export interface MovimientosListResponse {
-  data: Array<{
-    id: number;
-    attributes: Omit<MovimientoInventario, 'id'>;
-  }>;
+  data: MovimientoInventario[];
   meta: {
     pagination: {
       page: number;
@@ -69,33 +63,20 @@ export const inventarioService = {
     }
 
     const response = await api.get<MovimientosListResponse>(url);
-    return response.data.data.map(item => {
-      const producto = item.attributes.producto as any;
-      return {
-        id: item.id,
-        ...item.attributes,
-        producto: producto?.data ? {
-          id: producto.data.id,
-          nombre: producto.data.attributes.nombre,
-          codigo: producto.data.attributes.codigo
-        } : undefined
-      };
-    });
+    return response.data.data.map(item => ({
+      ...item,
+      producto: item.producto ? {
+        id: item.producto.id,
+        nombre: item.producto.nombre,
+        codigo: item.producto.codigo
+      } : undefined
+    }));
   },
 
   // Obtener movimiento por ID
   async getById(id: number): Promise<MovimientoInventario> {
     const response = await api.get<MovimientoResponse>(`/movimiento-inventarios/${id}?populate=producto`);
-    const producto = response.data.data.attributes.producto as any;
-    return {
-      id: response.data.data.id,
-      ...response.data.data.attributes,
-      producto: producto?.data ? {
-        id: producto.data.id,
-        nombre: producto.data.attributes.nombre,
-        codigo: producto.data.attributes.codigo
-      } : undefined
-    };
+    return response.data.data;
   },
 
   // Crear nuevo movimiento
@@ -103,10 +84,7 @@ export const inventarioService = {
     const response = await api.post<MovimientoResponse>('/movimiento-inventarios', {
       data
     });
-    return {
-      id: response.data.data.id,
-      ...response.data.data.attributes
-    };
+    return response.data.data;
   },
 
   // Actualizar movimiento
@@ -114,10 +92,7 @@ export const inventarioService = {
     const response = await api.put<MovimientoResponse>(`/movimiento-inventarios/${id}`, {
       data
     });
-    return {
-      id: response.data.data.id,
-      ...response.data.data.attributes
-    };
+    return response.data.data;
   },
 
   // Eliminar movimiento

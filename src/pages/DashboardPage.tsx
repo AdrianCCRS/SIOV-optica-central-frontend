@@ -1,240 +1,407 @@
-import { useQuery } from '@tanstack/react-query';
-import { statsService } from '../services/stats.service';
-import { formatCurrency } from '../utils/format';
-import LoadingSpinner from '../components/LoadingSpinner';
+import { useEffect, useState } from 'react';
+import { 
+  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, 
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
+} from 'recharts';
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
+import { reportesService } from '../services/reportes.service';
+import type { 
+  VentasDiarias, VentasPorCategoria, VentasPorMetodoPago, 
+  ProductoMasVendido, StockPorCategoria, ProductoBajoStock, IVAGenerado 
+} from '../services/reportes.service';
+import './DashboardPage.css';
+
+type PeriodoVentas = 'dia' | 'semana' | 'mes';
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#FF6B9D'];
 
 export default function DashboardPage() {
-  const { data: stats, isLoading } = useQuery({
-    queryKey: ['estadisticas-generales'],
-    queryFn: () => statsService.getEstadisticasGenerales(),
-    refetchInterval: 30000, // Refrescar cada 30 segundos
-  });
+  const [periodo, setPeriodo] = useState<PeriodoVentas>('dia');
+  const [loading, setLoading] = useState(true);
+  
+  const [ventasDiarias, setVentasDiarias] = useState<VentasDiarias[]>([]);
+  const [ventasPorCategoria, setVentasPorCategoria] = useState<VentasPorCategoria[]>([]);
+  const [ventasPorMetodoPago, setVentasPorMetodoPago] = useState<VentasPorMetodoPago[]>([]);
+  const [productosMasVendidos, setProductosMasVendidos] = useState<ProductoMasVendido[]>([]);
+  const [stockPorCategoria, setStockPorCategoria] = useState<StockPorCategoria[]>([]);
+  const [productosBajoStock, setProductosBajoStock] = useState<ProductoBajoStock[]>([]);
+  const [ivaGenerado, setIvaGenerado] = useState<IVAGenerado | null>(null);
 
-  const { data: ventasPorDia } = useQuery({
-    queryKey: ['ventas-por-dia'],
-    queryFn: () => statsService.getVentasPorDia(7),
-    refetchInterval: 60000, // Refrescar cada minuto
-  });
+  const getFechas = (periodo: PeriodoVentas) => {
+    const hoy = new Date();
+    let fechaInicio: Date;
+    let fechaFin: Date = hoy;
 
-  if (isLoading || !stats) {
-    return <LoadingSpinner message="Cargando estadísticas..." size="lg" />;
+    switch (periodo) {
+      case 'dia':
+        fechaInicio = hoy;
+        break;
+      case 'semana':
+        fechaInicio = startOfWeek(hoy, { weekStartsOn: 1 });
+        fechaFin = endOfWeek(hoy, { weekStartsOn: 1 });
+        break;
+      case 'mes':
+        fechaInicio = startOfMonth(hoy);
+        fechaFin = endOfMonth(hoy);
+        break;
+      default:
+        fechaInicio = hoy;
+    }
+
+    return {
+      fechaInicio: format(fechaInicio, 'yyyy-MM-dd'),
+      fechaFin: format(fechaFin, 'yyyy-MM-dd')
+    };
+  };
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const { fechaInicio, fechaFin } = getFechas(periodo);
+      
+      const [ventas, categorias, metodosPago, topProductos, stock, bajoStock, iva] = await Promise.all([
+        reportesService.getVentasDiarias(fechaInicio, fechaFin),
+        reportesService.getVentasPorCategoria(fechaInicio, fechaFin),
+        reportesService.getVentasPorMetodoPago(fechaInicio, fechaFin),
+        reportesService.getProductosMasVendidos(fechaInicio, fechaFin),
+        reportesService.getStockPorCategoria(),
+        reportesService.getProductosBajoStock(),
+        reportesService.getIVAGenerado(fechaInicio, fechaFin)
+      ]);
+
+      setVentasDiarias(ventas);
+      setVentasPorCategoria(categorias);
+      setVentasPorMetodoPago(metodosPago);
+      setProductosMasVendidos(topProductos);
+      setStockPorCategoria(stock);
+      setProductosBajoStock(bajoStock);
+      setIvaGenerado(iva);
+    } catch (error) {
+      console.error('Error cargando datos del dashboard:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, [periodo]);
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0
+    }).format(value);
+  };
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-tooltip">
+          <p className="tooltip-label">{label}</p>
+          {payload.map((entry: any, index: number) => {
+            const entryName = String(entry.name || '');
+            const shouldFormatCurrency = typeof entry.value === 'number' && 
+              (entryName.toLowerCase().includes('total') || entryName.toLowerCase().includes('ventas'));
+            
+            return (
+              <p key={index} className="tooltip-item" style={{ color: entry.color }}>
+                {entryName}: {shouldFormatCurrency ? formatCurrency(entry.value) : entry.value}
+              </p>
+            );
+          })}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-content">
+          <div className="spinner"></div>
+          <p className="loading-title">Cargando dashboard...</p>
+          <p className="loading-subtitle">Procesando datos analíticos</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div style={{ padding: '32px', backgroundColor: '#f8f9fa', minHeight: '100%' }}>
-      <h1 style={{ margin: '0 0 32px 0', color: '#333', fontSize: '28px' }}>
-        Dashboard - Panel de Administración
-      </h1>
-
-      {/* Cards de resumen */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gap: '20px',
-        marginBottom: '32px',
-      }}>
-        {/* Ventas de Hoy */}
-        <div style={{
-          backgroundColor: 'white',
-          padding: '24px',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        }}>
-          <div style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>
-            Ventas del Día
+    <div className="dashboard-container">
+      <div className="dashboard-wrapper">
+        {/* Header */}
+        <div className="dashboard-header">
+          <div>
+            <h1 className="dashboard-title">Dashboard Analítico</h1>
+            <p className="dashboard-subtitle">Vista general de métricas y estadísticas empresariales</p>
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#4CAF50', marginBottom: '4px' }}>
-            {formatCurrency(stats.ventasHoy.total)}
-          </div>
-          <div style={{ fontSize: '12px', color: '#999' }}>
-            {stats.ventasHoy.cantidad} transacción{stats.ventasHoy.cantidad !== 1 ? 'es' : ''}
+          
+          {/* Selector de periodo */}
+          <div className="period-selector">
+            {(['dia', 'semana', 'mes'] as PeriodoVentas[]).map((p) => (
+              <button
+                key={p}
+                onClick={() => setPeriodo(p)}
+                className={`period-button ${periodo === p ? 'period-button-active' : ''}`}
+              >
+                {p === 'dia' ? 'Hoy' : p === 'semana' ? 'Esta Semana' : 'Este Mes'}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Ventas del Mes */}
-        <div style={{
-          backgroundColor: 'white',
-          padding: '24px',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        }}>
-          <div style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>
-            Ventas del Mes
-          </div>
-          <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#2196F3', marginBottom: '4px' }}>
-            {formatCurrency(stats.ventasMes.total)}
-          </div>
-          <div style={{ fontSize: '12px', color: '#999' }}>
-            {stats.ventasMes.cantidad} transacción{stats.ventasMes.cantidad !== 1 ? 'es' : ''}
-          </div>
-        </div>
-
-        {/* Productos Activos */}
-        <div style={{
-          backgroundColor: 'white',
-          padding: '24px',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        }}>
-          <div style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>
-            Productos Activos
-          </div>
-          <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#673AB7', marginBottom: '4px' }}>
-            {stats.totalProductos}
-          </div>
-          <div style={{ fontSize: '12px', color: stats.productosConBajoStock > 0 ? '#ff9800' : '#999' }}>
-            {stats.productosConBajoStock} con bajo stock
-          </div>
-        </div>
-
-        {/* Total Clientes */}
-        <div style={{
-          backgroundColor: 'white',
-          padding: '24px',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        }}>
-          <div style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>
-            Clientes Registrados
-          </div>
-          <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#FF5722', marginBottom: '4px' }}>
-            {stats.totalClientes}
-          </div>
-          <div style={{ fontSize: '12px', color: '#999' }}>
-            Total en el sistema
-          </div>
-        </div>
-      </div>
-
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '20px',
-        marginBottom: '32px',
-      }}>
-        {/* Top Productos por Ventas */}
-        <div style={{
-          backgroundColor: 'white',
-          padding: '24px',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        }}>
-          <h2 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#333' }}>
-            Top 5 Productos por Ventas
-          </h2>
-          {stats.ventasPorProducto.length === 0 ? (
-            <div style={{ color: '#999', textAlign: 'center', padding: '20px' }}>
-              No hay datos de ventas disponibles
+        {/* Bento Grid */}
+        <div className="bento-grid">
+          {/* 1. Ventas Diarias */}
+          <div className="bento-card bento-large">
+            <div className="card-header">
+              <h3>Tendencia de Ventas</h3>
+              <p>Evolución temporal del periodo seleccionado</p>
             </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {stats.ventasPorProducto.map((item, index) => (
-                <div
-                  key={index}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '12px',
-                    backgroundColor: '#f8f9fa',
-                    borderRadius: '6px',
-                  }}
+            <ResponsiveContainer width="100%" height={350}>
+              <LineChart data={ventasDiarias} margin={{ top: 10, right: 30, left: 20, bottom: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis 
+                  dataKey="fecha" 
+                  tick={{ fontSize: 13, fill: '#6B7280', fontWeight: 500 }}
+                  tickFormatter={(value) => format(new Date(value), 'dd/MM')}
+                  stroke="#D1D5DB"
+                />
+                <YAxis tick={{ fontSize: 13, fill: '#6B7280', fontWeight: 500 }} stroke="#D1D5DB" />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend wrapperStyle={{ paddingTop: '20px' }} iconType="circle" />
+                <Line 
+                  type="monotone" 
+                  dataKey="total" 
+                  stroke="#0088FE" 
+                  strokeWidth={4}
+                  name="Total Ventas"
+                  dot={{ fill: '#0088FE', strokeWidth: 2, r: 6 }}
+                  activeDot={{ r: 8, fill: '#0066CC' }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="cantidad_facturas" 
+                  stroke="#00C49F" 
+                  strokeWidth={3}
+                  name="Núm. Facturas"
+                  dot={{ fill: '#00C49F', strokeWidth: 2, r: 5 }}
+                  activeDot={{ r: 7 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* 2. Ventas por Categoría */}
+          <div className="bento-card bento-medium-tall">
+            <div className="card-header">
+              <h3>Ventas por Categoría</h3>
+              <p>Distribución por tipo de producto</p>
+            </div>
+            <ResponsiveContainer width="100%" height={360}>
+              <BarChart data={ventasPorCategoria} layout="vertical" margin={{ top: 10, right: 30, left: 110, bottom: 10 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis type="number" tick={{ fontSize: 13, fill: '#6B7280', fontWeight: 500 }} stroke="#D1D5DB" />
+                <YAxis 
+                  dataKey="categoria" 
+                  type="category" 
+                  width={100} 
+                  tick={{ fontSize: 12, fill: '#374151', fontWeight: 600 }} 
+                  stroke="#D1D5DB" 
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="total" fill="#00C49F" name="Total Ventas" radius={[0, 10, 10, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* 3. Métodos de Pago */}
+          <div className="bento-card bento-medium">
+            <div className="card-header">
+              <h3>Métodos de Pago</h3>
+              <p>Preferencias de pago</p>
+            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={ventasPorMetodoPago as any}
+                  dataKey="total"
+                  nameKey="metodo_pago"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label={(entry: any) => `${((entry.percent || 0) * 100).toFixed(0)}%`}
+                  labelLine={{ stroke: '#6B7280', strokeWidth: 1 }}
                 >
-                  <div>
-                    <div style={{ fontWeight: 'bold', color: '#333', marginBottom: '4px' }}>
-                      {item.producto}
-                    </div>
-                    <div style={{ fontSize: '12px', color: '#666' }}>
-                      {item.cantidad} unidades vendidas
-                    </div>
+                  {ventasPorMetodoPago.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+                <Legend verticalAlign="bottom" height={36} iconType="circle" />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* 4. Stock por Categoría */}
+          <div className="bento-card bento-medium">
+            <div className="card-header">
+              <h3>Inventario</h3>
+              <p>Stock por categoría</p>
+            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={stockPorCategoria} margin={{ top: 10, right: 20, left: 10, bottom: 70 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis 
+                  dataKey="categoria" 
+                  tick={{ fontSize: 11, fill: '#374151', fontWeight: 600 }} 
+                  angle={-45} 
+                  textAnchor="end" 
+                  height={80}
+                  stroke="#D1D5DB"
+                />
+                <YAxis tick={{ fontSize: 13, fill: '#6B7280', fontWeight: 500 }} stroke="#D1D5DB" />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="cantidad" fill="#8884D8" name="Stock Total" radius={[10, 10, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* 5. Análisis IVA */}
+          {ivaGenerado && (
+            <div className="bento-card bento-wide">
+              <div className="card-header">
+                <h3>Análisis de IVA</h3>
+                <p>Desglose de impuestos generados</p>
+              </div>
+              <div className="iva-grid">
+                <div className="iva-stats">
+                  <div className="stat-box stat-primary">
+                    <p className="stat-label">Ventas Totales</p>
+                    <p className="stat-value">{formatCurrency(ivaGenerado.total_ventas)}</p>
                   </div>
-                  <div style={{ fontWeight: 'bold', color: '#4CAF50', fontSize: '16px' }}>
-                    {formatCurrency(item.total)}
+                  <div className="stat-box stat-success">
+                    <p className="stat-label">Total IVA Recaudado</p>
+                    <p className="stat-value stat-value-green">{formatCurrency(ivaGenerado.total_iva)}</p>
+                  </div>
+                  <div className="stat-box stat-info">
+                    <p className="stat-label">Ventas sin IVA</p>
+                    <p className="stat-value stat-value-blue">{formatCurrency(ivaGenerado.total_sin_iva)}</p>
                   </div>
                 </div>
-              ))}
+                <ResponsiveContainer width="100%" height={280}>
+                  <PieChart>
+                    <Pie
+                      data={ivaGenerado.desglose_iva}
+                      dataKey="total"
+                      nameKey="tasa"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={70}
+                      outerRadius={110}
+                      label={(entry: any) => `${entry.tasa}%`}
+                      labelLine={{ stroke: '#6B7280' }}
+                    >
+                      {ivaGenerado.desglose_iva.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend iconType="circle" />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           )}
-        </div>
 
-        {/* Ventas por Día (últimos 7 días) */}
-        <div style={{
-          backgroundColor: 'white',
-          padding: '24px',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        }}>
-          <h2 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#333' }}>
-            Ventas de los Últimos 7 Días
-          </h2>
-          {!ventasPorDia || ventasPorDia.length === 0 ? (
-            <div style={{ color: '#999', textAlign: 'center', padding: '20px' }}>
-              No hay datos de ventas disponibles
+          {/* 6. Top Productos */}
+          <div className="bento-card bento-medium-tall">
+            <div className="card-header">
+              <h3>Top Productos</h3>
+              <p>Los 10 más vendidos</p>
             </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {ventasPorDia.map((item, index) => {
-                const fecha = new Date(item.fecha + 'T00:00:00');
-                const fechaFormateada = fecha.toLocaleDateString('es-CO', {
-                  weekday: 'short',
-                  day: 'numeric',
-                  month: 'short',
-                });
-                
-                return (
-                  <div
-                    key={index}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      padding: '12px',
-                      backgroundColor: '#f8f9fa',
-                      borderRadius: '6px',
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontWeight: 'bold', color: '#333', marginBottom: '4px' }}>
-                        {fechaFormateada}
-                      </div>
-                      <div style={{ fontSize: '12px', color: '#666' }}>
-                        {item.cantidad} venta{item.cantidad !== 1 ? 's' : ''}
-                      </div>
-                    </div>
-                    <div style={{ fontWeight: 'bold', color: '#2196F3', fontSize: '16px' }}>
-                      {formatCurrency(item.total)}
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="table-container">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Pos</th>
+                    <th>Producto</th>
+                    <th style={{ textAlign: 'right' }}>Cant</th>
+                    <th style={{ textAlign: 'right' }}>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {productosMasVendidos.map((producto, index) => (
+                    <tr key={index}>
+                      <td>
+                        <span className={`position-badge position-${index + 1}`}>
+                          {index + 1}
+                        </span>
+                      </td>
+                      <td className="product-name">{producto.nombre}</td>
+                      <td style={{ textAlign: 'right' }}>
+                        <span className="quantity-badge">{producto.cantidad}</span>
+                      </td>
+                      <td className="product-total">{formatCurrency(producto.total)}</td>
+                    </tr>
+                  ))}
+                  {productosMasVendidos.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="empty-state">
+                        <p className="empty-title">No hay datos</p>
+                        <p className="empty-subtitle">Aún no hay ventas registradas</p>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
-          )}
-        </div>
-      </div>
+          </div>
 
-      {/* Alertas y Avisos */}
-      {stats.productosConBajoStock > 0 && (
-        <div style={{
-          backgroundColor: '#fff3cd',
-          border: '1px solid #ffc107',
-          borderRadius: '8px',
-          padding: '16px',
-          marginBottom: '20px',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '24px' }}>⚠️</span>
-            <div>
-              <div style={{ fontWeight: 'bold', color: '#856404', marginBottom: '4px' }}>
-                Alerta de Inventario
-              </div>
-              <div style={{ color: '#856404', fontSize: '14px' }}>
-                Hay {stats.productosConBajoStock} producto{stats.productosConBajoStock !== 1 ? 's' : ''} con stock bajo el mínimo.
-                Revisa el inventario para realizar reposición.
-              </div>
+          {/* 7. Alertas de Stock */}
+          <div className="bento-card bento-medium">
+            <div className="card-header">
+              <h3>Alertas de Stock</h3>
+              <p>Productos bajo mínimo</p>
+            </div>
+            <div className="table-container table-container-small">
+              <table className="data-table stock-table">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th style={{ textAlign: 'center' }}>Actual</th>
+                    <th style={{ textAlign: 'center' }}>Mínimo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {productosBajoStock.map((producto, index) => (
+                    <tr key={index}>
+                      <td className="product-name">{producto.nombre}</td>
+                      <td style={{ textAlign: 'center' }}>
+                        <span className="stock-badge stock-low">{producto.stock_actual}</span>
+                      </td>
+                      <td style={{ textAlign: 'center' }}>
+                        <span className="stock-min">{producto.stock_minimo}</span>
+                      </td>
+                    </tr>
+                  ))}
+                  {productosBajoStock.length === 0 && (
+                    <tr>
+                      <td colSpan={3} className="empty-state">
+                        <p className="empty-title stock-ok">¡Todo en orden!</p>
+                        <p className="empty-subtitle">Todos los productos tienen stock suficiente</p>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

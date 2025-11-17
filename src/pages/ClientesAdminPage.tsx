@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 //import { useQueryClient } from '@tanstack/react-query';
 import { clientesService, type Cliente } from '../services/clientes.service';
 import LoadingSpinner from '../components/LoadingSpinner';
+import './ClientesAdminPage.css';
 
 export default function ClientesAdminPage() {
   //const queryClient = useQueryClient();

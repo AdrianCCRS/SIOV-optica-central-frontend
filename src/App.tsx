@@ -15,6 +15,7 @@ import MovimientosInventarioPage from './pages/MovimientosInventarioPage';
 import DashboardPage from './pages/DashboardPage';
 import ClientesAdminPage from './pages/ClientesAdminPage';
 import InactiveUserPage from './pages/InactiveUserPage';
+import UsuariosAdminPage from './pages/UsuariosAdminPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,7 +28,7 @@ const queryClient = new QueryClient({
 
 type POSPage = 'pos' | 'ventas' | 'historico';
 type BodegaPage = 'productos' | 'categorias' | 'movimientos';
-type AdminPage = 'dashboard' | 'productos' | 'categorias' | 'movimientos' | 'clientes' | 'ventas' | 'historico';
+type AdminPage = 'dashboard' | 'productos' | 'categorias' | 'movimientos' | 'clientes' | 'ventas' | 'historico' | 'usuarios';
 
 function AppContent() {
   const { initAuth } = useAuthStore();
@@ -84,6 +85,8 @@ function AppContent() {
           return <VentasDelDiaPage />;
         case 'historico':
           return <HistoricoVentasPage />;
+          case 'usuarios':
+            return <UsuariosAdminPage />;
         default:
           return <DashboardPage />;
       }

@@ -4,7 +4,7 @@ import './Header.css';
 
 type POSPage = 'pos' | 'ventas' | 'historico';
 type BodegaPage = 'productos' | 'categorias' | 'movimientos';
-type AdminPage = 'dashboard' | 'productos' | 'categorias' | 'movimientos' | 'clientes' | 'ventas' | 'historico';
+type AdminPage = 'dashboard' | 'productos' | 'categorias' | 'movimientos' | 'clientes' | 'ventas' | 'historico' | 'usuarios';
 
 interface HeaderProps {
   currentPage: POSPage | BodegaPage | AdminPage;
@@ -81,6 +81,22 @@ const Icons = {
       <line x1="21" y1="12" x2="9" y2="12"/>
     </svg>
   ),
+  UsersGroup: () => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+),
+
 };
 
 export default function Header({ currentPage, onNavigate }: HeaderProps) {
@@ -216,6 +232,13 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
             >
               <Icons.Clock />
               <span>Histórico</span>
+            </button>
+            <button
+              onClick={() => onNavigate('usuarios' as any)}
+              className={`nav-button ${currentPage === 'usuarios' ? 'nav-button-active' : ''}`}
+            >
+              <Icons.Users />
+              <span>Usuarios</span>
             </button>
           </>
         ) : isBodeguero ? (

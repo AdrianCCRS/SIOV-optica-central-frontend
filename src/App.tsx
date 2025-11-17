@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthStore } from './store/authStore';
+import { useUserRole } from './hooks/useUserRole';
+import { ROLE_INITIAL_PAGES } from './types/roles';
 import ProtectedRoute from './components/ProtectedRoute';
-import LoadingSpinner from './components/LoadingSpinner';
+import AppLoading from './components/AppLoading';
 import Header from './components/Header';
 import POSPage from './pages/POSPage';
 import VentasDelDiaPage from './pages/VentasDelDiaPage';
@@ -12,6 +14,7 @@ import CategoriasPage from './pages/CategoriasPage';
 import MovimientosInventarioPage from './pages/MovimientosInventarioPage';
 import DashboardPage from './pages/DashboardPage';
 import ClientesAdminPage from './pages/ClientesAdminPage';
+import InactiveUserPage from './pages/InactiveUserPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,7 +30,8 @@ type BodegaPage = 'productos' | 'categorias' | 'movimientos';
 type AdminPage = 'dashboard' | 'productos' | 'categorias' | 'movimientos' | 'clientes' | 'ventas' | 'historico';
 
 function AppContent() {
-  const { initAuth, user, isLoading } = useAuthStore();
+  const { initAuth } = useAuthStore();
+  const { role, isAdministrador, isBodeguero, isCajero, isLoading, user } = useUserRole();
   const [currentPage, setCurrentPage] = useState<POSPage | BodegaPage | AdminPage>('pos');
   
   useEffect(() => {
@@ -37,29 +41,26 @@ function AppContent() {
   // Determinar página inicial según el rol
   useEffect(() => {
     if (!isLoading && user?.role) {
-      const roleType = user.role.type?.toLowerCase();
-      
-      // Asignar página inicial según el rol
-      switch (roleType) {
-        case 'bodeguero':
-          setCurrentPage('productos');
-          break;
-        case 'administrador':
-          setCurrentPage('dashboard');
-          break;
-        case 'cajero':
-        case 'authenticated':
-        default:
-          setCurrentPage('pos');
-          break;
-      }
+      const initialPage = ROLE_INITIAL_PAGES[role];
+      setCurrentPage(initialPage);
     }
-  }, [user, isLoading]);
+  }, [user, isLoading, role]);
 
-  const roleType = user?.role?.type?.toLowerCase();
-  const isBodeguero = roleType === 'bodeguero';
-  const isCajero = roleType === 'cajero' || roleType === 'authenticated';
-  const isAdministrador = roleType === 'administrador';
+  // Mostrar loader mientras se cargan los datos del usuario
+  if (isLoading) {
+    return <AppLoading message="Verificando credenciales" />;
+  }
+
+  // Si hay usuario pero no tiene rol definido, seguir mostrando loader
+  // Esto previene el flash de contenido incorrecto mientras se carga el rol
+  if (user && !user.role?.type) {
+    return <AppLoading message="Cargando perfil de usuario" />;
+  }
+
+  // Verificar si el usuario está inactivo (activo = false)
+  if (user && user.activo === false) {
+    return <InactiveUserPage />;
+  }
 
   const handleNavigate = (page: POSPage | BodegaPage | AdminPage) => {
     setCurrentPage(page);
@@ -119,11 +120,6 @@ function AppContent() {
     // Fallback: mostrar POS por defecto
     return <POSPage />;
   };
-
-  // Mostrar spinner mientras carga antes del ProtectedRoute
-  if (isLoading) {
-    return <LoadingSpinner message="Cargando información del usuario..." size="lg" />;
-  }
 
   return (
     <ProtectedRoute>

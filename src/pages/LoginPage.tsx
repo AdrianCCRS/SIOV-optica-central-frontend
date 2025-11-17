@@ -1,21 +1,17 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
-import { useAuthStore } from '../store/authStore';
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const { setUser } = useAuthStore();
-
   const loginMutation = useMutation({
     mutationFn: authService.login,
-    onSuccess: (data) => {
-      setUser(data.user);
+    onSuccess: () => {
       setError('');
-      // Recargar la página para que App.tsx redirija al POS
+      // Recargar la página para que App.tsx inicie desde cero con initAuth()
       window.location.href = '/';
     },
     onError: (error: any) => {

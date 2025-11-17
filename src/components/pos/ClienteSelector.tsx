@@ -57,7 +57,7 @@ export default function ClienteSelector({
           onClick={onNewCliente}
           style={{
             padding: '10px 16px',
-            backgroundColor: '#4cb94cff',
+            backgroundColor: 'var(--color-primary-dark)',
             color: 'white',
             border: 'none',
             borderRadius: '8px',
@@ -69,11 +69,11 @@ export default function ClienteSelector({
             boxShadow: '0 2px 4px rgba(102, 126, 234, 0.2)',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#328632ff';
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-dark)';
             e.currentTarget.style.boxShadow = '0 4px 8px rgba(102, 126, 234, 0.3)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#4cb94cff';
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-dark)';
             e.currentTarget.style.boxShadow = '0 2px 4px rgba(102, 126, 234, 0.2)';
           }}
           title="Crear nuevo cliente"

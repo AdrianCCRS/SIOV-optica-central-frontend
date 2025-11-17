@@ -68,7 +68,7 @@ export default function CheckoutActions({
         }}
         onMouseEnter={(e) => {
           if (!isCheckoutDisabled) {
-            e.currentTarget.style.backgroundColor = '#45a049';
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-dark)';
             e.currentTarget.style.boxShadow = '0 4px 12px rgba(76, 175, 80, 0.4)';
             e.currentTarget.style.transform = 'translateY(-2px)';
           }

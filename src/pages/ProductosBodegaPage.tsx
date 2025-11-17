@@ -319,7 +319,7 @@ export default function ProductosBodegaPage() {
             justifyContent: 'center',
             alignItems: 'center',
             zIndex: 1000,
-            overflow: 'auto',
+            overflow: 'hidden',
             padding: '20px'
           }}
           onClick={handleCloseModal}
@@ -332,7 +332,7 @@ export default function ProductosBodegaPage() {
               width: '600px',
               maxWidth: '100%',
               maxHeight: '90vh',
-              overflow: 'auto'
+              overflow: 'hidden'
             }}
             onClick={(e) => e.stopPropagation()}
           >

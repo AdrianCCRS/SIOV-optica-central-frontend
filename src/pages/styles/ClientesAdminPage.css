@@ -183,7 +183,7 @@
   max-width: 800px;
   width: 90%;
   max-height: 90vh;
-  overflow: auto;
+   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* igual al inline */
 }
 

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+//import { useQueryClient } from '@tanstack/react-query';
 import { clientesService, type Cliente } from '../services/clientes.service';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function ClientesAdminPage() {
-  const queryClient = useQueryClient();
+  //const queryClient = useQueryClient();
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);

@@ -38,7 +38,7 @@ api.interceptors.response.use(
       // Token expirado o inválido
       localStorage.removeItem('jwt_token');
       localStorage.removeItem('user');
-      window.location.href = '/';
+      window.location.href = import.meta.env.VITE_APP_BASE_URL || '/';
     }
     return Promise.reject(error);
   }

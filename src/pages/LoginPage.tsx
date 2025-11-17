@@ -13,7 +13,7 @@ export default function LoginPage() {
     onSuccess: () => {
       setError('');
       // Recargar la página para que App.tsx inicie desde cero con initAuth()
-      window.location.href = '/';
+      window.location.href = import.meta.env.VITE_APP_BASE_URL || '/';
     },
     onError: (error: any) => {
       const message = error.response?.data?.error?.message || 'Error al iniciar sesión';

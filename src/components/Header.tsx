@@ -113,7 +113,7 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
   const handleLogout = () => {
     if (window.confirm('¿Estás seguro de que deseas cerrar sesión?')) {
       logout();
-      window.location.href = '/';
+      window.location.href = import.meta.env.VITE_APP_BASE_URL || '/';
     }
   };
 

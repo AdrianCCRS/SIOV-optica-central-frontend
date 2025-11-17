@@ -214,7 +214,7 @@ export const reportesService = {
   // Obtener productos más vendidos
   async getProductosMasVendidos(fechaInicio?: string, fechaFin?: string): Promise<ProductoMasVendido[]> {
     try {
-      const response = await api.get('/facturas?populate=detalles');
+      const response = await api.get('/facturas?populate[detalles][populate]=producto');
       const facturas = Array.isArray(response.data) ? response.data : response.data.data || [];
       
       // Filtrar por fecha
@@ -226,18 +226,25 @@ export const reportesService = {
         return true;
       });
       
-      // Obtener productos para mapear nombres
-      const productosResponse = await api.get('/productos');
-      const productos = Array.isArray(productosResponse.data) ? productosResponse.data : productosResponse.data.data || [];
-      const productosMap = new Map<number, string>(productos.map((p: any) => [p.id, p.nombre]));
-      
       const ventasPorProducto = new Map<number, { nombre: string; cantidad: number; total: number }>();
       
       facturasFiltradas.forEach((factura: any) => {
         const detalles = Array.isArray(factura.detalles) ? factura.detalles : [];
         detalles.forEach((detalle: any) => {
-          const productoId: number = typeof detalle.producto === 'object' ? detalle.producto.id : detalle.producto;
-          const nombre = productosMap.get(productoId) || 'Producto desconocido';
+          // Extraer información del producto
+          let productoId: number;
+          let nombre = 'Producto desconocido';
+          
+          if (detalle.producto) {
+            if (typeof detalle.producto === 'object') {
+              productoId = detalle.producto.id;
+              nombre = detalle.producto.nombre || 'Producto desconocido';
+            } else {
+              productoId = detalle.producto;
+            }
+          } else {
+            return; // Skip si no hay producto
+          }
           
           if (!ventasPorProducto.has(productoId)) {
             ventasPorProducto.set(productoId, { nombre, cantidad: 0, total: 0 });
@@ -248,7 +255,12 @@ export const reportesService = {
         });
       });
       
-      return Array.from(ventasPorProducto.values())
+      return Array.from(ventasPorProducto.entries())
+        .map(([_, stats]) => ({
+          nombre: stats.nombre,
+          cantidad: stats.cantidad,
+          total: stats.total
+        }))
         .sort((a, b) => b.cantidad - a.cantidad)
         .slice(0, 10);
     } catch (error) {
@@ -380,17 +392,22 @@ export const reportesService = {
           .filter(Boolean)
       ).size;
       
-      // Productos vendidos (sumar cantidades de todos los detalles)
-      const detallesResponse = await api.get('/detalle-facturas');
-      const detalles = Array.isArray(detallesResponse.data) ? detallesResponse.data : detallesResponse.data.data || [];
+      // Productos vendidos - obtener detalles de las facturas filtradas
+      const facturasIds = facturasFiltradas.map((f: any) => f.id);
+      let productosVendidos = 0;
       
-      const facturasIds = new Set(facturasFiltradas.map((f: any) => f.id));
-      const productosVendidos = detalles
-        .filter((d: any) => {
-          const facturaId = typeof d.factura === 'object' ? d.factura?.id : d.factura;
-          return facturasIds.has(facturaId);
-        })
-        .reduce((sum: number, d: any) => sum + (d.cantidad || 0), 0);
+      if (facturasIds.length > 0) {
+        // Obtener detalles con populate de factura para filtrar
+        const detallesResponse = await api.get('/detalle-facturas?populate=factura');
+        const detalles = Array.isArray(detallesResponse.data) ? detallesResponse.data : detallesResponse.data.data || [];
+        
+        productosVendidos = detalles
+          .filter((d: any) => {
+            const facturaId = typeof d.factura === 'object' ? d.factura?.id : d.factura;
+            return facturasIds.includes(facturaId);
+          })
+          .reduce((sum: number, d: any) => sum + (d.cantidad || 0), 0);
+      }
       
       const resultado: KPIMetricas = {
         ventas_total: ventasTotal,
@@ -521,7 +538,7 @@ export const reportesService = {
   // Obtener rendimiento de cajeros
   async getRendimientoCajeros(fechaInicio: string, fechaFin: string): Promise<RendimientoCajero[]> {
     try {
-      const response = await api.get('/facturas?populate=usuario');
+      const response = await api.get('/facturas?populate=user');
       const facturas = Array.isArray(response.data) ? response.data : response.data.data || [];
       
       // Filtrar por fecha
@@ -540,7 +557,7 @@ export const reportesService = {
       }>();
       
       facturasFiltradas.forEach((factura: any) => {
-        const usuarioData = typeof factura.usuario === 'object' ? factura.usuario : null;
+        const usuarioData = typeof factura.user === 'object' ? factura.user : null;
         if (!usuarioData) return;
         
         const usuarioId = usuarioData.id;

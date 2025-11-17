@@ -1,6 +1,5 @@
 {
   "name": "siov-pos-frontend",
-  "homepage": "https://adrianccrs.github.io/SIOV-optica-central-frontend/",
   "private": true,
   "version": "0.0.0",
   "type": "module",

@@ -1,0 +1,121 @@
+/* ===================================
+   Sistema de Variables CSS - SIOV
+   =================================== */
+
+:root {
+  /* Colores Primarios */
+  --color-primary: #0088FE;
+  --color-primary-light: #33A1FF;
+  --color-primary-dark: #0066CC;
+  --color-primary-alpha-10: rgba(0, 136, 254, 0.1);
+  --color-primary-alpha-15: rgba(0, 136, 254, 0.15);
+  --color-primary-alpha-20: rgba(0, 136, 254, 0.2);
+  --color-primary-alpha-30: rgba(0, 136, 254, 0.3);
+
+  /* Colores Secundarios - Palette de Charts */
+  --color-secondary-1: #00C49F;
+  --color-secondary-2: #FFBB28;
+  --color-secondary-3: #FF8042;
+  --color-secondary-4: #8884D8;
+  --color-secondary-5: #82CA9D;
+  --color-secondary-6: #FFC658;
+  --color-secondary-7: #FF6B9D;
+
+  /* Colores de Texto */
+  --color-text-primary: #111827;
+  --color-text-secondary: #374151;
+  --color-text-tertiary: #6B7280;
+  --color-text-quaternary: #9CA3AF;
+
+  /* Colores de Fondo */
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F9FAFB;
+  --color-bg-tertiary: #F3F4F6;
+  --color-bg-quaternary: #E5E7EB;
+
+  /* Colores de Estado */
+  --color-success: #10B981;
+  --color-success-light: #D1FAE5;
+  --color-success-dark: #059669;
+  
+  --color-warning: #F59E0B;
+  --color-warning-light: #FEF3C7;
+  --color-warning-dark: #D97706;
+  
+  --color-danger: #EF4444;
+  --color-danger-light: #FEE2E2;
+  --color-danger-dark: #DC2626;
+  
+  --color-info: #3B82F6;
+  --color-info-light: #DBEAFE;
+  --color-info-dark: #2563EB;
+
+  /* Gradientes */
+  --gradient-primary: linear-gradient(135deg, #0088FE 0%, #00C49F 100%);
+  --gradient-secondary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-bg: linear-gradient(to bottom right, #F9FAFB, #E5E7EB);
+  --gradient-text: linear-gradient(to right, #111827, #374151);
+  --gradient-card: linear-gradient(135deg, rgba(0, 136, 254, 0.05), rgba(0, 196, 159, 0.05));
+  --gradient-hover: linear-gradient(135deg, rgba(0, 136, 254, 0.08), rgba(0, 196, 159, 0.08));
+
+  /* Sombras */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-primary: 0 4px 12px rgba(0, 136, 254, 0.3);
+  --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.1);
+
+  /* Bordes */
+  --border-color: #E5E7EB;
+  --border-color-light: #F3F4F6;
+  --border-color-dark: #D1D5DB;
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 20px;
+
+  /* Espaciado */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* Tipografía */
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 15px;
+  --font-size-xl: 16px;
+  --font-size-2xl: 18px;
+  --font-size-3xl: 20px;
+  --font-size-4xl: 24px;
+  --font-size-5xl: 28px;
+  --font-size-6xl: 36px;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* Transiciones */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.3s ease;
+  --transition-all: all 0.2s ease;
+  --transition-colors: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+  --transition-transform: transform 0.2s ease;
+
+  /* Z-Index */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+}

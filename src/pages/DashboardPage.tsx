@@ -57,7 +57,25 @@ const Icons = {
   ),
 };
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#FF6B9D'];
+// Obtener colores desde CSS variables
+const getCSSVariable = (variable: string): string => {
+  if (typeof window !== 'undefined') {
+    return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
+  }
+  return '';
+};
+
+// Colores para charts usando variables CSS
+const COLORS = [
+  getCSSVariable('--color-primary') || '#0088FE',
+  getCSSVariable('--color-secondary-1') || '#00C49F',
+  getCSSVariable('--color-secondary-2') || '#FFBB28',
+  getCSSVariable('--color-secondary-3') || '#FF8042',
+  getCSSVariable('--color-secondary-4') || '#8884D8',
+  getCSSVariable('--color-secondary-5') || '#82CA9D',
+  getCSSVariable('--color-secondary-6') || '#FFC658',
+  getCSSVariable('--color-secondary-7') || '#FF6B9D',
+];
 
 export default function DashboardPage() {
   const [periodo, setPeriodo] = useState<PeriodoVentas>('dia');

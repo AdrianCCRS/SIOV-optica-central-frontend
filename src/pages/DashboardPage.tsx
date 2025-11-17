@@ -7,7 +7,8 @@ import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-f
 import { reportesService } from '../services/reportes.service';
 import type { 
   VentasDiarias, VentasPorCategoria, VentasPorMetodoPago, 
-  ProductoMasVendido, StockPorCategoria, ProductoBajoStock, IVAGenerado 
+  ProductoMasVendido, StockPorCategoria, ProductoBajoStock, IVAGenerado,
+  KPIMetricas, TopCliente, RendimientoCajero
 } from '../services/reportes.service';
 import './DashboardPage.css';
 
@@ -19,6 +20,7 @@ export default function DashboardPage() {
   const [periodo, setPeriodo] = useState<PeriodoVentas>('dia');
   const [loading, setLoading] = useState(true);
   
+  // Estados existentes
   const [ventasDiarias, setVentasDiarias] = useState<VentasDiarias[]>([]);
   const [ventasPorCategoria, setVentasPorCategoria] = useState<VentasPorCategoria[]>([]);
   const [ventasPorMetodoPago, setVentasPorMetodoPago] = useState<VentasPorMetodoPago[]>([]);
@@ -26,6 +28,11 @@ export default function DashboardPage() {
   const [stockPorCategoria, setStockPorCategoria] = useState<StockPorCategoria[]>([]);
   const [productosBajoStock, setProductosBajoStock] = useState<ProductoBajoStock[]>([]);
   const [ivaGenerado, setIvaGenerado] = useState<IVAGenerado | null>(null);
+  
+  // Nuevos estados para Fase 1
+  const [kpis, setKpis] = useState<KPIMetricas | null>(null);
+  const [topClientes, setTopClientes] = useState<TopCliente[]>([]);
+  const [rendimientoCajeros, setRendimientoCajeros] = useState<RendimientoCajero[]>([]);
 
   const getFechas = (periodo: PeriodoVentas) => {
     const hoy = new Date();
@@ -59,14 +66,17 @@ export default function DashboardPage() {
     try {
       const { fechaInicio, fechaFin } = getFechas(periodo);
       
-      const [ventas, categorias, metodosPago, topProductos, stock, bajoStock, iva] = await Promise.all([
+      const [ventas, categorias, metodosPago, topProductos, stock, bajoStock, iva, kpisData, clientes, cajeros] = await Promise.all([
         reportesService.getVentasDiarias(fechaInicio, fechaFin),
         reportesService.getVentasPorCategoria(fechaInicio, fechaFin),
         reportesService.getVentasPorMetodoPago(fechaInicio, fechaFin),
         reportesService.getProductosMasVendidos(fechaInicio, fechaFin),
         reportesService.getStockPorCategoria(),
         reportesService.getProductosBajoStock(),
-        reportesService.getIVAGenerado(fechaInicio, fechaFin)
+        reportesService.getIVAGenerado(fechaInicio, fechaFin),
+        reportesService.getKPIMetricas(fechaInicio, fechaFin, true),
+        reportesService.getTopClientes(fechaInicio, fechaFin, 10),
+        reportesService.getRendimientoCajeros(fechaInicio, fechaFin)
       ]);
 
       setVentasDiarias(ventas);
@@ -76,6 +86,9 @@ export default function DashboardPage() {
       setStockPorCategoria(stock);
       setProductosBajoStock(bajoStock);
       setIvaGenerado(iva);
+      setKpis(kpisData);
+      setTopClientes(clientes);
+      setRendimientoCajeros(cajeros);
     } catch (error) {
       console.error('Error cargando datos del dashboard:', error);
     } finally {
@@ -152,6 +165,76 @@ export default function DashboardPage() {
             ))}
           </div>
         </div>
+
+        {/* KPI Cards */}
+        {kpis && (
+          <div className="kpi-container">
+            <div className="kpi-card">
+              <div className="kpi-header">
+                <span className="kpi-icon">💰</span>
+                <span className="kpi-label">Ventas Totales</span>
+              </div>
+              <div className="kpi-value">{formatCurrency(kpis.ventas_total)}</div>
+              {kpis.comparativa_anterior && (
+                <div className={`kpi-change ${kpis.comparativa_anterior.ventas_cambio >= 0 ? 'kpi-change-positive' : 'kpi-change-negative'}`}>
+                  {kpis.comparativa_anterior.ventas_cambio >= 0 ? '↑' : '↓'} 
+                  {Math.abs(kpis.comparativa_anterior.ventas_cambio).toFixed(1)}% vs periodo anterior
+                </div>
+              )}
+            </div>
+
+            <div className="kpi-card">
+              <div className="kpi-header">
+                <span className="kpi-icon">🧾</span>
+                <span className="kpi-label">Ticket Promedio</span>
+              </div>
+              <div className="kpi-value">{formatCurrency(kpis.ticket_promedio)}</div>
+              {kpis.comparativa_anterior && (
+                <div className={`kpi-change ${kpis.comparativa_anterior.ticket_cambio >= 0 ? 'kpi-change-positive' : 'kpi-change-negative'}`}>
+                  {kpis.comparativa_anterior.ticket_cambio >= 0 ? '↑' : '↓'} 
+                  {Math.abs(kpis.comparativa_anterior.ticket_cambio).toFixed(1)}% vs periodo anterior
+                </div>
+              )}
+            </div>
+
+            <div className="kpi-card">
+              <div className="kpi-header">
+                <span className="kpi-icon">📋</span>
+                <span className="kpi-label">Facturas</span>
+              </div>
+              <div className="kpi-value">{kpis.cantidad_facturas}</div>
+              {kpis.comparativa_anterior && (
+                <div className={`kpi-change ${kpis.comparativa_anterior.facturas_cambio >= 0 ? 'kpi-change-positive' : 'kpi-change-negative'}`}>
+                  {kpis.comparativa_anterior.facturas_cambio >= 0 ? '↑' : '↓'} 
+                  {Math.abs(kpis.comparativa_anterior.facturas_cambio).toFixed(1)}% vs periodo anterior
+                </div>
+              )}
+            </div>
+
+            <div className="kpi-card">
+              <div className="kpi-header">
+                <span className="kpi-icon">👥</span>
+                <span className="kpi-label">Clientes Atendidos</span>
+              </div>
+              <div className="kpi-value">{kpis.clientes_unicos}</div>
+              {kpis.comparativa_anterior && (
+                <div className={`kpi-change ${kpis.comparativa_anterior.clientes_cambio >= 0 ? 'kpi-change-positive' : 'kpi-change-negative'}`}>
+                  {kpis.comparativa_anterior.clientes_cambio >= 0 ? '↑' : '↓'} 
+                  {Math.abs(kpis.comparativa_anterior.clientes_cambio).toFixed(1)}% vs periodo anterior
+                </div>
+              )}
+            </div>
+
+            <div className="kpi-card">
+              <div className="kpi-header">
+                <span className="kpi-icon">📦</span>
+                <span className="kpi-label">Productos Vendidos</span>
+              </div>
+              <div className="kpi-value">{kpis.productos_vendidos}</div>
+              <div className="kpi-subtitle">Unidades totales</div>
+            </div>
+          </div>
+        )}
 
         {/* Bento Grid */}
         <div className="bento-grid">
@@ -393,6 +476,132 @@ export default function DashboardPage() {
                       <td colSpan={3} className="empty-state">
                         <p className="empty-title stock-ok">¡Todo en orden!</p>
                         <p className="empty-subtitle">Todos los productos tienen stock suficiente</p>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* 8. Top Clientes */}
+          <div className="bento-card bento-large">
+            <div className="card-header">
+              <h3>Top Clientes del Periodo</h3>
+              <p>Los clientes con mayor volumen de compras</p>
+            </div>
+            <div className="table-container">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Ranking</th>
+                    <th>Cliente</th>
+                    <th>Identificación</th>
+                    <th style={{ textAlign: 'right' }}>Compras</th>
+                    <th style={{ textAlign: 'right' }}>Total</th>
+                    <th style={{ textAlign: 'right' }}>Ticket Prom.</th>
+                    <th>Última Compra</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {topClientes.map((cliente, index) => (
+                    <tr key={cliente.cliente_id}>
+                      <td>
+                        <span className={`position-badge position-${index + 1}`}>
+                          {index + 1}
+                        </span>
+                      </td>
+                      <td className="product-name">{cliente.nombre_completo}</td>
+                      <td>{cliente.numero_identificacion}</td>
+                      <td style={{ textAlign: 'right' }}>
+                        <span className="quantity-badge">{cliente.numero_compras}</span>
+                      </td>
+                      <td className="product-total">{formatCurrency(cliente.total_comprado)}</td>
+                      <td style={{ textAlign: 'right', color: '#6B7280', fontWeight: 600 }}>
+                        {formatCurrency(cliente.ticket_promedio)}
+                      </td>
+                      <td style={{ fontSize: '13px', color: '#6B7280' }}>{cliente.ultima_compra}</td>
+                    </tr>
+                  ))}
+                  {topClientes.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="empty-state">
+                        <p className="empty-title">No hay datos</p>
+                        <p className="empty-subtitle">Aún no hay compras registradas en este periodo</p>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* 9. Rendimiento Cajeros */}
+          <div className="bento-card bento-large">
+            <div className="card-header">
+              <h3>Rendimiento por Cajero</h3>
+              <p>Desempeño del equipo de ventas</p>
+            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={rendimientoCajeros} margin={{ top: 10, right: 30, left: 20, bottom: 60 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis 
+                  dataKey="nombre_completo" 
+                  tick={{ fontSize: 12, fill: '#374151', fontWeight: 600 }} 
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                  stroke="#D1D5DB"
+                />
+                <YAxis tick={{ fontSize: 13, fill: '#6B7280', fontWeight: 500 }} stroke="#D1D5DB" />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend wrapperStyle={{ paddingTop: '10px' }} iconType="circle" />
+                <Bar dataKey="total_vendido" fill="#8884D8" name="Total Vendido" radius={[10, 10, 0, 0]} />
+                <Bar dataKey="ventas_realizadas" fill="#82CA9D" name="Núm. Ventas" radius={[10, 10, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+            <div className="table-container" style={{ marginTop: '20px' }}>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Cajero</th>
+                    <th style={{ textAlign: 'right' }}>Ventas</th>
+                    <th style={{ textAlign: 'right' }}>Total</th>
+                    <th style={{ textAlign: 'right' }}>Ticket Prom.</th>
+                    <th style={{ textAlign: 'right' }}>% del Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rendimientoCajeros.map((cajero) => (
+                    <tr key={cajero.usuario_id}>
+                      <td className="product-name">{cajero.nombre_completo}</td>
+                      <td style={{ textAlign: 'right' }}>
+                        <span className="quantity-badge">{cajero.ventas_realizadas}</span>
+                      </td>
+                      <td className="product-total">{formatCurrency(cajero.total_vendido)}</td>
+                      <td style={{ textAlign: 'right', color: '#6B7280', fontWeight: 600 }}>
+                        {formatCurrency(cajero.ticket_promedio)}
+                      </td>
+                      <td style={{ textAlign: 'right' }}>
+                        <span style={{ 
+                          display: 'inline-block',
+                          padding: '4px 10px',
+                          borderRadius: '12px',
+                          background: 'linear-gradient(to right, #DBEAFE, #BFDBFE)',
+                          color: '#1E40AF',
+                          fontWeight: 700,
+                          fontSize: '13px'
+                        }}>
+                          {cajero.porcentaje_total.toFixed(1)}%
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                  {rendimientoCajeros.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="empty-state">
+                        <p className="empty-title">No hay datos</p>
+                        <p className="empty-subtitle">Aún no hay ventas registradas en este periodo</p>
                       </td>
                     </tr>
                   )}

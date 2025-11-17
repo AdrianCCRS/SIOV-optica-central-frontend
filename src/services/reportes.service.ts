@@ -46,6 +46,41 @@ export interface IVAGenerado {
   }[];
 }
 
+// Nuevas interfaces para Fase 1
+export interface KPIMetricas {
+  ventas_total: number;
+  ticket_promedio: number;
+  cantidad_facturas: number;
+  clientes_unicos: number;
+  productos_vendidos: number;
+  comparativa_anterior?: {
+    ventas_cambio: number;
+    ticket_cambio: number;
+    facturas_cambio: number;
+    clientes_cambio: number;
+  };
+}
+
+export interface TopCliente {
+  cliente_id: number;
+  nombre_completo: string;
+  numero_identificacion: string;
+  total_comprado: number;
+  numero_compras: number;
+  ticket_promedio: number;
+  ultima_compra: string;
+}
+
+export interface RendimientoCajero {
+  usuario_id: number;
+  username: string;
+  nombre_completo: string;
+  ventas_realizadas: number;
+  total_vendido: number;
+  ticket_promedio: number;
+  porcentaje_total: number;
+}
+
 export const reportesService = {
   // Obtener ventas diarias/semanales/mensuales
   async getVentasDiarias(fechaInicio: string, fechaFin: string): Promise<VentasDiarias[]> {
@@ -316,6 +351,226 @@ export const reportesService = {
         total_sin_iva: 0,
         desglose_iva: []
       };
+    }
+  },
+
+  // ==================== FASE 1: NUEVOS MÉTODOS ====================
+
+  // Obtener KPIs y métricas clave
+  async getKPIMetricas(fechaInicio: string, fechaFin: string, calcularComparativa: boolean = true): Promise<KPIMetricas> {
+    try {
+      const response = await api.get('/facturas?populate=cliente');
+      const facturas = Array.isArray(response.data) ? response.data : response.data.data || [];
+      
+      // Filtrar por fecha del periodo actual
+      const facturasFiltradas = facturas.filter((f: any) => {
+        const fecha = f.fecha_emision?.split('T')[0] || f.fecha_emision;
+        return fecha >= fechaInicio && fecha <= fechaFin;
+      });
+      
+      // Calcular métricas del periodo actual
+      const ventasTotal = facturasFiltradas.reduce((sum: number, f: any) => sum + (parseFloat(f.total) || 0), 0);
+      const cantidadFacturas = facturasFiltradas.length;
+      const ticketPromedio = cantidadFacturas > 0 ? ventasTotal / cantidadFacturas : 0;
+      
+      // Clientes únicos
+      const clientesUnicos = new Set(
+        facturasFiltradas
+          .map((f: any) => typeof f.cliente === 'object' ? f.cliente?.id : f.cliente)
+          .filter(Boolean)
+      ).size;
+      
+      // Productos vendidos (sumar cantidades de todos los detalles)
+      const detallesResponse = await api.get('/detalle-facturas');
+      const detalles = Array.isArray(detallesResponse.data) ? detallesResponse.data : detallesResponse.data.data || [];
+      
+      const facturasIds = new Set(facturasFiltradas.map((f: any) => f.id));
+      const productosVendidos = detalles
+        .filter((d: any) => {
+          const facturaId = typeof d.factura === 'object' ? d.factura?.id : d.factura;
+          return facturasIds.has(facturaId);
+        })
+        .reduce((sum: number, d: any) => sum + (d.cantidad || 0), 0);
+      
+      const resultado: KPIMetricas = {
+        ventas_total: ventasTotal,
+        ticket_promedio: ticketPromedio,
+        cantidad_facturas: cantidadFacturas,
+        clientes_unicos: clientesUnicos,
+        productos_vendidos: productosVendidos
+      };
+      
+      // Calcular comparativa con periodo anterior
+      if (calcularComparativa) {
+        const [añoInicio, mesInicio, diaInicio] = fechaInicio.split('-').map(Number);
+        const [añoFin, mesFin, diaFin] = fechaFin.split('-').map(Number);
+        
+        const inicio = new Date(añoInicio, mesInicio - 1, diaInicio);
+        const fin = new Date(añoFin, mesFin - 1, diaFin);
+        const diasDiferencia = Math.ceil((fin.getTime() - inicio.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        
+        const fechaInicioAnterior = new Date(inicio);
+        fechaInicioAnterior.setDate(fechaInicioAnterior.getDate() - diasDiferencia);
+        const fechaFinAnterior = new Date(inicio);
+        fechaFinAnterior.setDate(fechaFinAnterior.getDate() - 1);
+        
+        const formatFecha = (d: Date) => d.toISOString().split('T')[0];
+        
+        const facturasAnteriores = facturas.filter((f: any) => {
+          const fecha = f.fecha_emision?.split('T')[0] || f.fecha_emision;
+          return fecha >= formatFecha(fechaInicioAnterior) && fecha <= formatFecha(fechaFinAnterior);
+        });
+        
+        const ventasAnterior = facturasAnteriores.reduce((sum: number, f: any) => sum + (parseFloat(f.total) || 0), 0);
+        const facturasAnterior = facturasAnteriores.length;
+        const ticketAnterior = facturasAnterior > 0 ? ventasAnterior / facturasAnterior : 0;
+        const clientesAnterior = new Set(
+          facturasAnteriores
+            .map((f: any) => typeof f.cliente === 'object' ? f.cliente?.id : f.cliente)
+            .filter(Boolean)
+        ).size;
+        
+        const calcularCambio = (actual: number, anterior: number) => {
+          if (anterior === 0) return actual > 0 ? 100 : 0;
+          return ((actual - anterior) / anterior) * 100;
+        };
+        
+        resultado.comparativa_anterior = {
+          ventas_cambio: calcularCambio(ventasTotal, ventasAnterior),
+          ticket_cambio: calcularCambio(ticketPromedio, ticketAnterior),
+          facturas_cambio: calcularCambio(cantidadFacturas, facturasAnterior),
+          clientes_cambio: calcularCambio(clientesUnicos, clientesAnterior)
+        };
+      }
+      
+      return resultado;
+    } catch (error) {
+      console.error('Error obteniendo KPI métricas:', error);
+      return {
+        ventas_total: 0,
+        ticket_promedio: 0,
+        cantidad_facturas: 0,
+        clientes_unicos: 0,
+        productos_vendidos: 0
+      };
+    }
+  },
+
+  // Obtener top clientes del periodo
+  async getTopClientes(fechaInicio: string, fechaFin: string, limite: number = 10): Promise<TopCliente[]> {
+    try {
+      const response = await api.get('/facturas?populate=cliente');
+      const facturas = Array.isArray(response.data) ? response.data : response.data.data || [];
+      
+      // Filtrar por fecha
+      const facturasFiltradas = facturas.filter((f: any) => {
+        const fecha = f.fecha_emision?.split('T')[0] || f.fecha_emision;
+        return fecha >= fechaInicio && fecha <= fechaFin;
+      });
+      
+      // Agrupar por cliente
+      const ventasPorCliente = new Map<number, {
+        cliente: any;
+        total: number;
+        cantidad: number;
+        ultima_fecha: string;
+      }>();
+      
+      facturasFiltradas.forEach((factura: any) => {
+        const clienteData = typeof factura.cliente === 'object' ? factura.cliente : null;
+        if (!clienteData) return;
+        
+        const clienteId = clienteData.id;
+        if (!ventasPorCliente.has(clienteId)) {
+          ventasPorCliente.set(clienteId, {
+            cliente: clienteData,
+            total: 0,
+            cantidad: 0,
+            ultima_fecha: factura.fecha_emision
+          });
+        }
+        
+        const stats = ventasPorCliente.get(clienteId)!;
+        stats.total += parseFloat(factura.total) || 0;
+        stats.cantidad += 1;
+        
+        // Actualizar última fecha si es más reciente
+        if (factura.fecha_emision > stats.ultima_fecha) {
+          stats.ultima_fecha = factura.fecha_emision;
+        }
+      });
+      
+      return Array.from(ventasPorCliente.entries())
+        .map(([clienteId, stats]) => ({
+          cliente_id: clienteId,
+          nombre_completo: `${stats.cliente.nombres || ''} ${stats.cliente.apellidos || ''}`.trim(),
+          numero_identificacion: stats.cliente.numero_identificacion || 'N/A',
+          total_comprado: stats.total,
+          numero_compras: stats.cantidad,
+          ticket_promedio: stats.total / stats.cantidad,
+          ultima_compra: stats.ultima_fecha.split('T')[0]
+        }))
+        .sort((a, b) => b.total_comprado - a.total_comprado)
+        .slice(0, limite);
+    } catch (error) {
+      console.error('Error obteniendo top clientes:', error);
+      return [];
+    }
+  },
+
+  // Obtener rendimiento de cajeros
+  async getRendimientoCajeros(fechaInicio: string, fechaFin: string): Promise<RendimientoCajero[]> {
+    try {
+      const response = await api.get('/facturas?populate=usuario');
+      const facturas = Array.isArray(response.data) ? response.data : response.data.data || [];
+      
+      // Filtrar por fecha
+      const facturasFiltradas = facturas.filter((f: any) => {
+        const fecha = f.fecha_emision?.split('T')[0] || f.fecha_emision;
+        return fecha >= fechaInicio && fecha <= fechaFin;
+      });
+      
+      const totalGeneral = facturasFiltradas.reduce((sum: number, f: any) => sum + (parseFloat(f.total) || 0), 0);
+      
+      // Agrupar por usuario
+      const ventasPorUsuario = new Map<number, {
+        usuario: any;
+        total: number;
+        cantidad: number;
+      }>();
+      
+      facturasFiltradas.forEach((factura: any) => {
+        const usuarioData = typeof factura.usuario === 'object' ? factura.usuario : null;
+        if (!usuarioData) return;
+        
+        const usuarioId = usuarioData.id;
+        if (!ventasPorUsuario.has(usuarioId)) {
+          ventasPorUsuario.set(usuarioId, {
+            usuario: usuarioData,
+            total: 0,
+            cantidad: 0
+          });
+        }
+        
+        const stats = ventasPorUsuario.get(usuarioId)!;
+        stats.total += parseFloat(factura.total) || 0;
+        stats.cantidad += 1;
+      });
+      
+      return Array.from(ventasPorUsuario.entries())
+        .map(([usuarioId, stats]) => ({
+          usuario_id: usuarioId,
+          username: stats.usuario.username || 'N/A',
+          nombre_completo: `${stats.usuario.nombres || ''} ${stats.usuario.apellidos || ''}`.trim() || stats.usuario.username,
+          ventas_realizadas: stats.cantidad,
+          total_vendido: stats.total,
+          ticket_promedio: stats.total / stats.cantidad,
+          porcentaje_total: totalGeneral > 0 ? (stats.total / totalGeneral) * 100 : 0
+        }))
+        .sort((a, b) => b.total_vendido - a.total_vendido);
+    } catch (error) {
+      console.error('Error obteniendo rendimiento cajeros:', error);
+      return [];
     }
   }
 };

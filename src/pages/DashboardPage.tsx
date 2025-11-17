@@ -15,6 +15,48 @@ import './DashboardPage.css';
 type PeriodoVentas = 'dia' | 'semana' | 'mes';
 type TabDashboard = 'general' | 'ventas' | 'productos' | 'equipo';
 
+// Iconos SVG consistentes
+const Icons = {
+  ChartBar: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="20" x2="12" y2="10"/>
+      <line x1="18" y1="20" x2="18" y2="4"/>
+      <line x1="6" y1="20" x2="6" y2="16"/>
+    </svg>
+  ),
+  Money: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="1" x2="12" y2="23"/>
+      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+    </svg>
+  ),
+  Package: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/>
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+      <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+      <line x1="12" y1="22.08" x2="12" y2="12"/>
+    </svg>
+  ),
+  Users: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+  ),
+  Receipt: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/>
+      <line x1="16" y1="17" x2="8" y2="17"/>
+      <polyline points="10 9 9 9 8 9"/>
+    </svg>
+  ),
+};
+
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#FF6B9D'];
 
 export default function DashboardPage() {
@@ -174,28 +216,28 @@ export default function DashboardPage() {
             onClick={() => setActiveTab('general')}
             className={`tab-button ${activeTab === 'general' ? 'tab-button-active' : ''}`}
           >
-            <span className="tab-icon">📊</span>
+            <span className="tab-icon"><Icons.ChartBar /></span>
             <span>General</span>
           </button>
           <button
             onClick={() => setActiveTab('ventas')}
             className={`tab-button ${activeTab === 'ventas' ? 'tab-button-active' : ''}`}
           >
-            <span className="tab-icon">💰</span>
+            <span className="tab-icon"><Icons.Money /></span>
             <span>Ventas</span>
           </button>
           <button
             onClick={() => setActiveTab('productos')}
             className={`tab-button ${activeTab === 'productos' ? 'tab-button-active' : ''}`}
           >
-            <span className="tab-icon">📦</span>
+            <span className="tab-icon"><Icons.Package /></span>
             <span>Productos</span>
           </button>
           <button
             onClick={() => setActiveTab('equipo')}
             className={`tab-button ${activeTab === 'equipo' ? 'tab-button-active' : ''}`}
           >
-            <span className="tab-icon">👥</span>
+            <span className="tab-icon"><Icons.Users /></span>
             <span>Clientes & Equipo</span>
           </button>
         </div>
@@ -205,7 +247,7 @@ export default function DashboardPage() {
           <div className="kpi-container">
             <div className="kpi-card">
               <div className="kpi-header">
-                <span className="kpi-icon">💰</span>
+                <span className="kpi-icon"><Icons.Money /></span>
                 <span className="kpi-label">Ventas Totales</span>
               </div>
               <div className="kpi-value">{formatCurrency(kpis.ventas_total)}</div>
@@ -219,7 +261,7 @@ export default function DashboardPage() {
 
             <div className="kpi-card">
               <div className="kpi-header">
-                <span className="kpi-icon">🧾</span>
+                <span className="kpi-icon"><Icons.Receipt /></span>
                 <span className="kpi-label">Ticket Promedio</span>
               </div>
               <div className="kpi-value">{formatCurrency(kpis.ticket_promedio)}</div>
@@ -233,7 +275,7 @@ export default function DashboardPage() {
 
             <div className="kpi-card">
               <div className="kpi-header">
-                <span className="kpi-icon">📋</span>
+                <span className="kpi-icon"><Icons.Receipt /></span>
                 <span className="kpi-label">Facturas</span>
               </div>
               <div className="kpi-value">{kpis.cantidad_facturas}</div>
@@ -247,7 +289,7 @@ export default function DashboardPage() {
 
             <div className="kpi-card">
               <div className="kpi-header">
-                <span className="kpi-icon">👥</span>
+                <span className="kpi-icon"><Icons.Users /></span>
                 <span className="kpi-label">Clientes Atendidos</span>
               </div>
               <div className="kpi-value">{kpis.clientes_unicos}</div>
@@ -261,7 +303,7 @@ export default function DashboardPage() {
 
             <div className="kpi-card">
               <div className="kpi-header">
-                <span className="kpi-icon">📦</span>
+                <span className="kpi-icon"><Icons.Package /></span>
                 <span className="kpi-label">Productos Vendidos</span>
               </div>
               <div className="kpi-value">{kpis.productos_vendidos}</div>

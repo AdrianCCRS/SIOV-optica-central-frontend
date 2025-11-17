@@ -155,8 +155,15 @@
 }
 
 .tab-icon {
-  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
+}
+
+.tab-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 /* KPI Cards Container */
@@ -201,8 +208,19 @@
 }
 
 .kpi-icon {
-  font-size: 24px;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #0088FE15, #00C49F15);
+  border-radius: 12px;
+  color: #0088FE;
+}
+
+.kpi-icon svg {
+  width: 22px;
+  height: 22px;
 }
 
 .kpi-label {
@@ -629,8 +647,9 @@
     font-size: 14px;
   }
   
-  .tab-icon {
-    font-size: 18px;
+  .tab-icon svg {
+    width: 18px;
+    height: 18px;
   }
   
   .kpi-container {

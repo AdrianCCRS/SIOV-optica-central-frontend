@@ -18,7 +18,6 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
   const isBodeguero = roleType === 'bodeguero';
   const isCajero = roleType === 'cajero' || roleType === 'authenticated';
   const isAdministrador = roleType === 'administrador';
-  console.log(user);
   // Mostrar alertas de stock solo para bodeguero y administrador
   const showStockAlerts = isBodeguero || isAdministrador;
 

@@ -2,6 +2,7 @@ import api from './api';
 
 export interface Producto {
   id: number;
+  documentId: string; // Usado para eliminación en Strapi v5
   referencia: string;
   nombre: string;
   descripcion?: string;
@@ -35,6 +36,7 @@ export const productosService = {
     const items = Array.isArray(response.data) ? response.data : response.data.data || [];
     return items.map((item: any) => ({
       id: item.id,
+      documentId: item.documentId,
       referencia: item.referencia,
       nombre: item.nombre,
       descripcion: item.descripcion,
@@ -56,6 +58,7 @@ export const productosService = {
     const items = Array.isArray(response.data) ? response.data : response.data.data || [];
     return items.map((item: any) => ({
       id: item.id,
+      documentId: item.documentId,
       referencia: item.referencia,
       nombre: item.nombre,
       descripcion: item.descripcion,
@@ -71,12 +74,13 @@ export const productosService = {
     }));
   },
 
-  // Obtener un producto por ID
-  async obtenerProducto(id: number): Promise<Producto> {
-    const response = await api.get(`/productos/${id}?populate=categoria`);
+  // Obtener un producto por documentId
+  async obtenerProducto(documentId: string): Promise<Producto> {
+    const response = await api.get(`/productos/${documentId}?populate=categoria`);
     const item = response.data.data || response.data;
     return {
       id: item.id,
+      documentId: item.documentId,
       referencia: item.referencia,
       nombre: item.nombre,
       descripcion: item.descripcion,
@@ -98,6 +102,7 @@ export const productosService = {
     const items = Array.isArray(response.data) ? response.data : response.data.data || [];
     return items.map((item: any) => ({
       id: item.id,
+      documentId: item.documentId,
       referencia: item.referencia,
       nombre: item.nombre,
       descripcion: item.descripcion,
@@ -125,6 +130,7 @@ export const productosService = {
     const item = response.data.data || response.data;
     return {
       id: item.id,
+      documentId: item.documentId,
       referencia: item.referencia,
       nombre: item.nombre,
       descripcion: item.descripcion,
@@ -140,12 +146,13 @@ export const productosService = {
     };
   },
 
-  // Actualizar producto
-  async update(id: number, data: Partial<CreateProductoData>): Promise<Producto> {
-    const response = await api.put(`/productos/${id}`, { data });
+  // Actualizar producto - usar documentId en Strapi v5
+  async update(documentId: string, data: Partial<CreateProductoData>): Promise<Producto> {
+    const response = await api.put(`/productos/${documentId}`, { data });
     const item = response.data.data || response.data;
     return {
       id: item.id,
+      documentId: item.documentId,
       referencia: item.referencia,
       nombre: item.nombre,
       descripcion: item.descripcion,
@@ -161,9 +168,9 @@ export const productosService = {
     };
   },
 
-  // Eliminar producto
-  async delete(id: number): Promise<void> {
-    await api.delete(`/productos/${id}`);
+  // Eliminar producto - usar documentId en Strapi v5
+  async delete(documentId: string): Promise<void> {
+    await api.delete(`/productos/${documentId}`);
   },
 
   // Obtener productos con bajo stock (stock_actual <= stock_minimo)
@@ -173,6 +180,7 @@ export const productosService = {
     return items
       .map((item: any) => ({
         id: item.id,
+        documentId: item.documentId,
         referencia: item.referencia,
         nombre: item.nombre,
         descripcion: item.descripcion,

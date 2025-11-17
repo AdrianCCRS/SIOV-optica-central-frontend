@@ -2,6 +2,7 @@ import api from './api';
 
 export interface MovimientoInventario {
   id: number;
+  documentId: string; // Usado para eliminación en Strapi v5
   tipo_movimiento: 'Entrada' | 'Salida' | 'Ajuste Inventario' | 'Devolución';
   cantidad: number;
   motivo: string;
@@ -67,6 +68,7 @@ export const inventarioService = {
     const response = await api.get<MovimientosListResponse>(url);
     return response.data.data.map(item => ({
       id: item.id,
+      documentId: item.documentId,
       tipo_movimiento: item.tipo_movimiento,
       cantidad: item.cantidad || 0,
       motivo: item.motivo,
@@ -82,10 +84,22 @@ export const inventarioService = {
     }));
   },
 
-  // Obtener movimiento por ID
-  async getById(id: number): Promise<MovimientoInventario> {
-    const response = await api.get<MovimientoResponse>(`/movimiento-inventarios/${id}?populate=producto`);
-    return response.data.data;
+  // Obtener movimiento por documentId
+  async getById(documentId: string): Promise<MovimientoInventario> {
+    const response = await api.get<MovimientoResponse>(`/movimiento-inventarios/${documentId}?populate=producto`);
+    const item = response.data.data;
+    return {
+      id: item.id,
+      documentId: item.documentId,
+      tipo_movimiento: item.tipo_movimiento,
+      cantidad: item.cantidad,
+      motivo: item.motivo,
+      fecha: item.fecha,
+      stock_resultante: item.stock_resultante,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+      producto: item.producto
+    };
   },
 
   // Crear nuevo movimiento
@@ -93,19 +107,43 @@ export const inventarioService = {
     const response = await api.post<MovimientoResponse>('/movimiento-inventarios', {
       data
     });
-    return response.data.data;
+    const item = response.data.data;
+    return {
+      id: item.id,
+      documentId: item.documentId,
+      tipo_movimiento: item.tipo_movimiento,
+      cantidad: item.cantidad,
+      motivo: item.motivo,
+      fecha: item.fecha,
+      stock_resultante: item.stock_resultante,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+      producto: item.producto
+    };
   },
 
-  // Actualizar movimiento
-  async update(id: number, data: Partial<CreateMovimientoData>): Promise<MovimientoInventario> {
-    const response = await api.put<MovimientoResponse>(`/movimiento-inventarios/${id}`, {
+  // Actualizar movimiento - usar documentId en Strapi v5
+  async update(documentId: string, data: Partial<CreateMovimientoData>): Promise<MovimientoInventario> {
+    const response = await api.put<MovimientoResponse>(`/movimiento-inventarios/${documentId}`, {
       data
     });
-    return response.data.data;
+    const item = response.data.data;
+    return {
+      id: item.id,
+      documentId: item.documentId,
+      tipo_movimiento: item.tipo_movimiento,
+      cantidad: item.cantidad,
+      motivo: item.motivo,
+      fecha: item.fecha,
+      stock_resultante: item.stock_resultante,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+      producto: item.producto
+    };
   },
 
-  // Eliminar movimiento
-  async delete(id: number): Promise<void> {
-    await api.delete(`/movimiento-inventarios/${id}`);
+  // Eliminar movimiento - usar documentId en Strapi v5
+  async delete(documentId: string): Promise<void> {
+    await api.delete(`/movimiento-inventarios/${documentId}`);
   }
 };

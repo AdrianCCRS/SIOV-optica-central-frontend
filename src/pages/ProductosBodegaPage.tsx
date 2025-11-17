@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { productosService, type Producto } from '../services/productos.service';
 import { categoriasService, type CategoriaProducto } from '../services/categorias.service';
+import { useUserRole } from '../hooks/useUserRole';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function ProductosBodegaPage() {
   const queryClient = useQueryClient();
+  const { isAdministrador } = useUserRole();
   const [productos, setProductos] = useState<Producto[]>([]);
   const [categorias, setCategorias] = useState<CategoriaProducto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,7 +64,7 @@ export default function ProductosBodegaPage() {
       };
 
       if (editingProducto) {
-        await productosService.update(editingProducto.id, data);
+        await productosService.update(editingProducto.documentId, data);
       } else {
         await productosService.create(data);
       }
@@ -92,6 +94,24 @@ export default function ProductosBodegaPage() {
       categoria: producto.categoria?.id.toString() || ''
     });
     setShowModal(true);
+  };
+
+  const handleDelete = async (producto: Producto) => {
+    if (!confirm(`¿Estás seguro de eliminar el producto "${producto.nombre}"?`)) {
+      return;
+    }
+
+    try {
+      await productosService.delete(producto.documentId);
+      
+      // Invalidar la caché de productos con bajo stock
+      queryClient.invalidateQueries({ queryKey: ['productos-bajo-stock'] });
+      
+      alert('Producto eliminado exitosamente');
+      loadData();
+    } catch (error) {
+      alert('Error al eliminar el producto. Puede que esté siendo utilizado en otras transacciones.');
+    }
   };
 
   const resetForm = () => {
@@ -255,6 +275,22 @@ export default function ProductosBodegaPage() {
                     >
                       Editar
                     </button>
+                    {isAdministrador && (
+                      <button
+                        onClick={() => handleDelete(producto)}
+                        style={{
+                          padding: '6px 12px',
+                          backgroundColor: '#f44336',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '12px'
+                        }}
+                      >
+                        Eliminar
+                      </button>
+                    )}
                   </td>
                 </tr>
               );

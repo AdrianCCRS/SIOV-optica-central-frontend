@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { categoriasService, type CategoriaProducto } from '../services/categorias.service';
+import { useUserRole } from '../hooks/useUserRole';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function CategoriasPage() {
+  const { isAdministrador } = useUserRole();
   const [categorias, setCategorias] = useState<CategoriaProducto[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -33,7 +35,7 @@ export default function CategoriasPage() {
     
     try {
       if (editingCategoria) {
-        await categoriasService.update(editingCategoria.id, formData);
+        await categoriasService.update(editingCategoria.documentId, formData);
       } else {
         await categoriasService.create(formData);
       }
@@ -54,6 +56,25 @@ export default function CategoriasPage() {
       descripcion: categoria.descripcion || ''
     });
     setShowModal(true);
+  };
+
+  const handleDelete = async (categoria: CategoriaProducto) => {
+    console.log('Intentando eliminar categoría:', categoria);
+    console.log('documentId:', categoria.documentId);
+    
+    if (!confirm(`¿Estás seguro de eliminar la categoría "${categoria.nombre}"?`)) {
+      return;
+    }
+
+    try {
+      console.log('Llamando a categoriasService.delete con documentId:', categoria.documentId);
+      await categoriasService.delete(categoria.documentId);
+      alert('Categoría eliminada exitosamente');
+      loadCategorias();
+    } catch (error) {
+      console.error('Error al eliminar:', error);
+      alert('Error al eliminar la categoría. Puede que esté siendo utilizada por productos.');
+    }
   };
 
   const handleCloseModal = () => {
@@ -113,11 +134,28 @@ export default function CategoriasPage() {
                       border: 'none',
                       borderRadius: '4px',
                       cursor: 'pointer',
+                      marginRight: '8px',
                       fontSize: '12px'
                     }}
                   >
                     Editar
                   </button>
+                  {isAdministrador && (
+                    <button
+                      onClick={() => handleDelete(categoria)}
+                      style={{
+                        padding: '6px 12px',
+                        backgroundColor: '#f44336',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px'
+                      }}
+                    >
+                      Eliminar
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

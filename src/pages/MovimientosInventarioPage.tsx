@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { inventarioService, type MovimientoInventario, type CreateMovimientoData } from '../services/inventario.service';
 import { productosService, type Producto } from '../services/productos.service';
+import { useUserRole } from '../hooks/useUserRole';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function MovimientosInventarioPage() {
   const queryClient = useQueryClient();
+  const { isAdministrador } = useUserRole();
   const [movimientos, setMovimientos] = useState<MovimientoInventario[]>([]);
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -124,6 +126,24 @@ export default function MovimientosInventarioPage() {
     });
   };
 
+  const handleDelete = async (movimiento: MovimientoInventario) => {
+    if (!confirm(`¿Estás seguro de eliminar este movimiento de inventario?`)) {
+      return;
+    }
+
+    try {
+      await inventarioService.delete(movimiento.documentId);
+      
+      // Invalidar la caché de productos con bajo stock
+      queryClient.invalidateQueries({ queryKey: ['productos-bajo-stock'] });
+      
+      alert('Movimiento eliminado exitosamente');
+      loadData();
+    } catch (error) {
+      alert('Error al eliminar el movimiento.');
+    }
+  };
+
   const handleCloseModal = () => {
     setShowModal(false);
     resetForm();
@@ -226,6 +246,7 @@ export default function MovimientosInventarioPage() {
               <th style={{ padding: '12px', textAlign: 'center' }}>Tipo</th>
               <th style={{ padding: '12px', textAlign: 'center' }}>Cantidad</th>
               <th style={{ padding: '12px', textAlign: 'left' }}>Motivo</th>
+              {isAdministrador && <th style={{ padding: '12px', textAlign: 'center' }}>Acciones</th>}
             </tr>
           </thead>
           <tbody>
@@ -270,6 +291,24 @@ export default function MovimientosInventarioPage() {
                 <td style={{ padding: '12px' }}>
                   {movimiento.motivo || '-'}
                 </td>
+                {isAdministrador && (
+                  <td style={{ padding: '12px', textAlign: 'center' }}>
+                    <button
+                      onClick={() => handleDelete(movimiento)}
+                      style={{
+                        padding: '6px 12px',
+                        backgroundColor: '#f44336',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px'
+                      }}
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

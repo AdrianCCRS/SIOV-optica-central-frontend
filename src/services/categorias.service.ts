@@ -2,6 +2,7 @@ import api from './api';
 
 export interface CategoriaProducto {
   id: number;
+  documentId: string; // Usado para eliminación en Strapi v5
   nombre: string;
   descripcion?: string;
   createdAt?: string;
@@ -33,13 +34,29 @@ export const categoriasService = {
   // Obtener todas las categorías
   async getAll(): Promise<CategoriaProducto[]> {
     const response = await api.get<CategoriasListResponse>('/categoria-productos');
-    return response.data.data;
+    // Mapear explícitamente para asegurar que documentId esté presente
+    return response.data.data.map(item => ({
+      id: item.id,
+      documentId: item.documentId,
+      nombre: item.nombre,
+      descripcion: item.descripcion,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt
+    }));
   },
 
-  // Obtener categoría por ID
-  async getById(id: number): Promise<CategoriaProducto> {
-    const response = await api.get<CategoriaResponse>(`/categoria-productos/${id}`);
-    return response.data.data;
+  // Obtener categoría por documentId
+  async getById(documentId: string): Promise<CategoriaProducto> {
+    const response = await api.get<CategoriaResponse>(`/categoria-productos/${documentId}`);
+    const item = response.data.data;
+    return {
+      id: item.id,
+      documentId: item.documentId,
+      nombre: item.nombre,
+      descripcion: item.descripcion,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt
+    };
   },
 
   // Crear nueva categoría
@@ -47,19 +64,37 @@ export const categoriasService = {
     const response = await api.post<CategoriaResponse>('/categoria-productos', {
       data
     });
-    return response.data.data;
+    const item = response.data.data;
+    return {
+      id: item.id,
+      documentId: item.documentId,
+      nombre: item.nombre,
+      descripcion: item.descripcion,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt
+    };
   },
 
-  // Actualizar categoría
-  async update(id: number, data: Partial<CreateCategoriaData>): Promise<CategoriaProducto> {
-    const response = await api.put<CategoriaResponse>(`/categoria-productos/${id}`, {
+  // Actualizar categoría - usar documentId en Strapi v5
+  async update(documentId: string, data: Partial<CreateCategoriaData>): Promise<CategoriaProducto> {
+    const response = await api.put<CategoriaResponse>(`/categoria-productos/${documentId}`, {
       data
     });
-    return response.data.data;
+    const item = response.data.data;
+    return {
+      id: item.id,
+      documentId: item.documentId,
+      nombre: item.nombre,
+      descripcion: item.descripcion,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt
+    };
   },
 
-  // Eliminar categoría
-  async delete(id: number): Promise<void> {
-    await api.delete(`/categoria-productos/${id}`);
+  // Eliminar categoría - usar documentId en Strapi v5
+  async delete(documentId: string): Promise<void> {
+    console.log('categoriasService.delete - URL completa:', `/categoria-productos/${documentId}`);
+    const response = await api.delete(`/categoria-productos/${documentId}`);
+    console.log('categoriasService.delete - Respuesta:', response);
   }
 };

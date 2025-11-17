@@ -1,0 +1,31 @@
+/* POS Page Styles */
+.pos-container {
+  display: grid;
+  grid-template-columns: 1fr 0.7fr;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-2xl);
+  background-color: var(--color-bg-secondary);
+  min-height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.pos-left-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .pos-container {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+  }
+}
+
+@media (max-width: 768px) {
+  .pos-container {
+    padding: var(--spacing-md);
+  }
+}

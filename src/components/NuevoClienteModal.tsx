@@ -235,7 +235,7 @@ export default function NuevoClienteModal({ onClose, onClienteCreado }: NuevoCli
               style={{
                 flex: 1,
                 padding: '12px',
-                backgroundColor: '#4CAF50',
+                backgroundColor: 'var(--color-primary-dark)',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',

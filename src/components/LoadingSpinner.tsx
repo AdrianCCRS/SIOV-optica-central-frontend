@@ -1,55 +1,52 @@
+import './LoadingSpinner.css';
+
 interface LoadingSpinnerProps {
   message?: string;
   size?: 'sm' | 'md' | 'lg';
+  showBranding?: boolean;
+  subtitle?: string;
 }
 
 export default function LoadingSpinner({ 
   message = 'Cargando...', 
-  size = 'md' 
+  size = 'md',
+  showBranding = false,
+  subtitle = 'Por favor espere...'
 }: LoadingSpinnerProps) {
-  const sizeMap = {
-    sm: '30px',
-    md: '50px',
-    lg: '70px'
-  };
-
-  const borderWidth = {
-    sm: '3px',
-    md: '5px',
-    lg: '7px'
-  };
+  const sizeClass = `loading-spinner-${size}`;
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        backgroundColor: '#f5f5f5',
-        gap: '20px'
-      }}
-    >
-      <div
-        style={{
-          width: sizeMap[size],
-          height: sizeMap[size],
-          border: `${borderWidth[size]} solid #e0e0e0`,
-          borderTop: `${borderWidth[size]} solid #4CAF50`,
-          borderRadius: '50%',
-          animation: 'spin 0.8s linear infinite'
-        }}
-      />
-      <p style={{ fontSize: '16px', color: '#666', margin: 0 }}>
-        {message}
-      </p>
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
+    <div className="loading-container">
+      <div className="loading-content">
+        {/* Branding (solo si showBranding es true) */}
+        {showBranding && (
+          <div className="loading-branding">
+            <h1 className="loading-brand-title">
+              Óptica Central
+            </h1>
+            <p className="loading-brand-subtitle">
+              Sistema de Ventas
+            </p>
+          </div>
+        )}
+
+        {/* Spinner animado */}
+        <div className={`loading-spinner ${sizeClass}`}>
+          <div className="loading-spinner-circle" />
+        </div>
+
+        {/* Mensaje */}
+        <p className="loading-message">
+          {message}
+        </p>
+
+        {/* Subtitle */}
+        {subtitle && (
+          <p className="loading-subtext">
+            {subtitle}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { ventasService } from '../services/ventas.service';
 import { formatCurrency } from '../utils/format';
 import DetalleFacturaModal from '../components/DetalleFacturaModal';
 import LoadingSpinner from '../components/LoadingSpinner';
+import './styles/VentasDelDiaPage.css';
 
 export default function VentasDelDiaPage() {
   const [facturaSeleccionada, setFacturaSeleccionada] = useState<{ id: number; numero: string } | null>(null);
@@ -20,7 +21,7 @@ export default function VentasDelDiaPage() {
 
   if (error) {
     return (
-      <div style={{ padding: '20px', textAlign: 'center', color: 'red' }}>
+      <div className="error-container">
         <p>Error al cargar ventas: {(error as any).message}</p>
         <button onClick={() => refetch()}>Reintentar</button>
       </div>
@@ -32,136 +33,108 @@ export default function VentasDelDiaPage() {
   const cantidadVentas = data?.cantidad_ventas || 0;
 
   return (
-    <div style={{ padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h2 style={{ margin: 0 }}>Ventas del Día</h2>
+    <div className="ventas-dia-container">
+      <div className="ventas-dia-header">
+        <h2 className="ventas-dia-title">Ventas del Día</h2>
         <button
           onClick={() => refetch()}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-          }}
+          className="btn-actualizar"
+          disabled={isLoading}
+          style={{ display: 'flex', alignItems: 'center', gap: 8 }}
         >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className={isLoading ? 'spin-reload' : ''}
+            style={{ transition: 'transform 0.3s' }}
+          >
+            <path d="M10 2v2a6 6 0 1 1-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <polyline points="4 4 10 2 8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+          </svg>
           Actualizar
         </button>
       </div>
 
       {/* Resumen */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gap: '20px',
-        marginBottom: '30px',
-      }}>
-        <div style={{
-          padding: '20px',
-          backgroundColor: '#f5f5f5',
-          borderRadius: '8px',
-          border: '2px solid #4CAF50',
-        }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#666' }}>Total Ventas</h3>
-          <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#4CAF50' }}>
+      <div className="resumen-grid">
+        <div className="resumen-card resumen-card-success">
+          <h3 className="resumen-card-title">Total Ventas</h3>
+          <p className="resumen-card-value resumen-card-value-success">
             {formatCurrency(totalVentas)}
           </p>
         </div>
 
-        <div style={{
-          padding: '20px',
-          backgroundColor: '#f5f5f5',
-          borderRadius: '8px',
-          border: '2px solid #2196F3',
-        }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#666' }}>Cantidad de Ventas</h3>
-          <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#2196F3' }}>
+        <div className="resumen-card resumen-card-info">
+          <h3 className="resumen-card-title">Cantidad de Ventas</h3>
+          <p className="resumen-card-value resumen-card-value-info">
             {cantidadVentas}
           </p>
         </div>
 
-        <div style={{
-          padding: '20px',
-          backgroundColor: '#f5f5f5',
-          borderRadius: '8px',
-          border: '2px solid #FF9800',
-        }}>
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#666' }}>Promedio por Venta</h3>
-          <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#FF9800' }}>
+        <div className="resumen-card resumen-card-warning">
+          <h3 className="resumen-card-title">Promedio por Venta</h3>
+          <p className="resumen-card-value resumen-card-value-warning">
             {formatCurrency(cantidadVentas > 0 ? totalVentas / cantidadVentas : 0)}
           </p>
         </div>
       </div>
 
       {/* Tabla de Facturas */}
-      <div style={{ overflowX: 'auto' }}>
-        <h3 style={{ marginBottom: '15px' }}>Detalle de Facturas</h3>
+      <div className="tabla-section">
+        <h3 className="tabla-section-title">Detalle de Facturas</h3>
         {facturas.length === 0 ? (
-          <p style={{ textAlign: 'center', color: '#999', padding: '40px' }}>
+          <p className="tabla-empty">
             No hay ventas registradas el día de hoy
           </p>
         ) : (
-          <table style={{
-            width: '100%',
-            borderCollapse: 'collapse',
-            backgroundColor: 'white',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          }}>
+          <table className="facturas-table">
             <thead>
-              <tr style={{ backgroundColor: '#f5f5f5', borderBottom: '2px solid #ddd' }}>
-                <th style={{ padding: '12px', textAlign: 'left' }}>Factura</th>
-                <th style={{ padding: '12px', textAlign: 'left' }}>Fecha/Hora</th>
-                <th style={{ padding: '12px', textAlign: 'left' }}>Cliente</th>
-                <th style={{ padding: '12px', textAlign: 'left' }}>Método Pago</th>
-                <th style={{ padding: '12px', textAlign: 'right' }}>Subtotal</th>
-                <th style={{ padding: '12px', textAlign: 'right' }}>IVA</th>
-                <th style={{ padding: '12px', textAlign: 'right' }}>Total</th>
-                <th style={{ padding: '12px', textAlign: 'center' }}>Acciones</th>
+              <tr>
+                <th>Factura</th>
+                <th>Fecha/Hora</th>
+                <th>Cliente</th>
+                <th>Método Pago</th>
+                <th className="align-right">Subtotal</th>
+                <th className="align-right">IVA</th>
+                <th className="align-right">Total</th>
+                <th className="align-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {facturas.map((factura: any) => (
-                <tr key={factura.id} style={{ borderBottom: '1px solid #eee' }}>
-                  <td style={{ padding: '12px', fontWeight: 'bold' }}>
+                <tr key={factura.id}>
+                  <td className="factura-numero">
                     {factura.numero_factura}
                   </td>
-                  <td style={{ padding: '12px' }}>
+                  <td>
                     {new Date(factura.fecha_emision).toLocaleString('es-CO', {
                       dateStyle: 'short',
                       timeStyle: 'short',
                     })}
                   </td>
-                  <td style={{ padding: '12px' }}>
+                  <td>
                     {factura.cliente?.nombres} {factura.cliente?.apellidos}
-                    <br />
-                    <span style={{ fontSize: '12px', color: '#666' }}>
+                    <span className="cliente-identificacion">
                       {factura.cliente?.numero_identificacion}
                     </span>
                   </td>
-                  <td style={{ padding: '12px' }}>{factura.medio_pago}</td>
-                  <td style={{ padding: '12px', textAlign: 'right' }}>
+                  <td>{factura.medio_pago}</td>
+                  <td className="align-right">
                     {formatCurrency(factura.subtotal)}
                   </td>
-                  <td style={{ padding: '12px', textAlign: 'right' }}>
+                  <td className="align-right">
                     {formatCurrency(factura.valor_iva)}
                   </td>
-                  <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold', fontSize: '16px' }}>
+                  <td className="align-right total-value">
                     {formatCurrency(factura.total)}
                   </td>
-                  <td style={{ padding: '12px', textAlign: 'center' }}>
+                  <td className="align-center">
                     <button
                       onClick={() => setFacturaSeleccionada({ id: factura.id, numero: factura.numero_factura })}
-                      style={{
-                        padding: '6px 12px',
-                        backgroundColor: '#2196F3',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                      }}
+                      className="btn-ver-detalles"
                     >
                       Ver Detalles
                     </button>
@@ -170,17 +143,17 @@ export default function VentasDelDiaPage() {
               ))}
             </tbody>
             <tfoot>
-              <tr style={{ backgroundColor: '#f9f9f9', fontWeight: 'bold', borderTop: '2px solid #ddd' }}>
-                <td colSpan={4} style={{ padding: '12px', textAlign: 'right' }}>
+              <tr>
+                <td colSpan={4} className="total-label">
                   TOTALES:
                 </td>
-                <td style={{ padding: '12px', textAlign: 'right' }}>
+                <td className="align-right">
                   {formatCurrency(facturas.reduce((sum: number, f: any) => sum + (f.subtotal || 0), 0))}
                 </td>
-                <td style={{ padding: '12px', textAlign: 'right' }}>
+                <td className="align-right">
                   {formatCurrency(facturas.reduce((sum: number, f: any) => sum + (f.valor_iva || 0), 0))}
                 </td>
-                <td style={{ padding: '12px', textAlign: 'right', fontSize: '18px' }}>
+                <td className="align-right total-final">
                   {formatCurrency(totalVentas)}
                 </td>
                 <td></td>
@@ -200,4 +173,19 @@ export default function VentasDelDiaPage() {
       )}
     </div>
   );
+}
+
+// Animación de rotación para el icono de recargar
+const style = document.createElement('style');
+style.innerHTML = `
+.spin-reload {
+  animation: spin-reload 1s linear infinite;
+}
+@keyframes spin-reload {
+  100% { transform: rotate(360deg); }
+}
+`;
+if (typeof document !== 'undefined' && !document.getElementById('spin-reload-style')) {
+  style.id = 'spin-reload-style';
+  document.head.appendChild(style);
 }

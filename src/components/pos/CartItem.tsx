@@ -141,7 +141,7 @@ export default function CartItem({ item, onUpdateQuantity, onRemove }: CartItemP
               cursor: 'pointer',
               fontSize: '20px',
               fontWeight: '400',
-              color: '#e53e3e',
+              color: 'var(--color-danger)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

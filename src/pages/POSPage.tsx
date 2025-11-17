@@ -9,6 +9,7 @@ import { formatCurrency } from '../utils/format';
 import SearchBar from '../components/pos/SearchBar';
 import ProductGrid from '../components/pos/ProductGrid';
 import CartPanel from '../components/pos/CartPanel';
+import './styles/POSPage.css';
 
 export default function POSPage() {
   const queryClient = useQueryClient();
@@ -93,17 +94,9 @@ export default function POSPage() {
   const totales = calcularTotales();
 
   return (
-    <div style={{ 
-      display: 'grid', 
-      gridTemplateColumns: '1fr 0.7fr', 
-      gap: '24px', 
-      padding: '32px',
-      backgroundColor: '#f8f9fa',
-      minHeight: '100%',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-    }}>
+    <div className="pos-container">
       {/* Panel izquierdo - Productos */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div className="pos-left-panel">
         <SearchBar
           value={busquedaProducto}
           onChange={setBusquedaProducto}

@@ -156,7 +156,7 @@ export default function ProductosBodegaPage() {
           onClick={() => setShowModal(true)}
           style={{
             padding: '10px 20px',
-            backgroundColor: '#4CAF50',
+            backgroundColor: 'var(--color-primary-dark)',
             color: 'white',
             border: 'none',
             borderRadius: '4px',
@@ -240,7 +240,7 @@ export default function ProductosBodegaPage() {
                       fontSize: '12px',
                       fontWeight: 'bold',
                       backgroundColor: stockStatus === 'sin-stock' ? '#f44336' :
-                                      stockStatus === 'bajo' ? '#ff9800' : '#4CAF50',
+                                      stockStatus === 'bajo' ? '#ff9800' : 'var(--color-primary-dark)',
                       color: 'white'
                     }}>
                       {stockStatus === 'sin-stock' ? 'SIN STOCK' :
@@ -253,7 +253,7 @@ export default function ProductosBodegaPage() {
                       borderRadius: '4px',
                       fontSize: '12px',
                       fontWeight: 'bold',
-                      backgroundColor: producto.activo ? '#4CAF50' : '#999',
+                      backgroundColor: producto.activo ? 'var(--color-primary-dark)' : '#999',
                       color: 'white'
                     }}>
                       {producto.activo ? 'SÍ' : 'NO'}
@@ -264,7 +264,7 @@ export default function ProductosBodegaPage() {
                       onClick={() => handleEdit(producto)}
                       style={{
                         padding: '6px 12px',
-                        backgroundColor: '#2196F3',
+                        backgroundColor: 'var(--color-primary-dark)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
@@ -280,7 +280,7 @@ export default function ProductosBodegaPage() {
                         onClick={() => handleDelete(producto)}
                         style={{
                           padding: '6px 12px',
-                          backgroundColor: '#f44336',
+                          backgroundColor: 'var(--color-danger)',
                           color: 'white',
                           border: 'none',
                           borderRadius: '4px',
@@ -549,7 +549,7 @@ export default function ProductosBodegaPage() {
                   type="submit"
                   style={{
                     padding: '10px 20px',
-                    backgroundColor: '#4CAF50',
+                    backgroundColor: 'var(--color-primary-dark)',
                     color: 'white',
                     border: 'none',
                     borderRadius: '4px',

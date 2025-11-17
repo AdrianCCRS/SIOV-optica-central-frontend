@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
+import './styles/LoginPage.css';
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState('');
@@ -33,28 +34,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '100vh',
-      backgroundColor: '#f5f5f5',
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '40px',
-        borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-        width: '100%',
-        maxWidth: '400px',
-      }}>
-        <h1 style={{ textAlign: 'center', marginBottom: '30px' }}>
-          Ópica Central - Sistema de Ventas
+    <div className="login-container">
+      <div className="login-card">
+        <h1 className="login-title">
+          Óptica Central - Sistema de Ventas
         </h1>
         
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+          <div className="login-form-group">
+            <label className="login-label">
               Usuario o Email
             </label>
             <input
@@ -62,19 +50,13 @@ export default function LoginPage() {
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               placeholder="Ingresa tu usuario o email"
-              style={{
-                width: '100%',
-                padding: '10px',
-                fontSize: '16px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-              }}
+              className="login-input"
               disabled={loginMutation.isPending}
             />
           </div>
 
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+          <div className="login-form-group">
+            <label className="login-label">
               Contraseña
             </label>
             <input
@@ -82,26 +64,13 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Ingresa tu contraseña"
-              style={{
-                width: '100%',
-                padding: '10px',
-                fontSize: '16px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-              }}
+              className="login-input"
               disabled={loginMutation.isPending}
             />
           </div>
 
           {error && (
-            <div style={{
-              padding: '10px',
-              marginBottom: '20px',
-              backgroundColor: '#ffebee',
-              color: '#c62828',
-              borderRadius: '4px',
-              fontSize: '14px',
-            }}>
+            <div className="login-error">
               {error}
             </div>
           )}
@@ -109,29 +78,13 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loginMutation.isPending}
-            style={{
-              width: '100%',
-              padding: '12px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              backgroundColor: '#4CAF50',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: loginMutation.isPending ? 'not-allowed' : 'pointer',
-              opacity: loginMutation.isPending ? 0.7 : 1,
-            }}
+            className="login-button"
           >
             {loginMutation.isPending ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
         </form>
 
-        <p style={{
-          marginTop: '20px',
-          textAlign: 'center',
-          fontSize: '14px',
-          color: '#666',
-        }}>
+        <p className="login-version">
           Versión 1.0.0
         </p>
       </div>

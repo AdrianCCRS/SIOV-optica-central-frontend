@@ -1,4 +1,5 @@
 import { authService } from '../services/auth.service';
+import './styles/InactiveUserPage.css';
 
 export default function InactiveUserPage() {
   const user = authService.getCurrentUser();
@@ -9,40 +10,13 @@ export default function InactiveUserPage() {
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%)',
-      padding: '20px',
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-        padding: '40px',
-        width: '100%',
-        maxWidth: '500px',
-      }}>
-        <div style={{ textAlign: 'center' }}>
+    <div className="inactive-container">
+      <div className="inactive-card">
+        <div className="inactive-content">
           {/* Icono de usuario inactivo */}
-          <div style={{
-            width: '80px',
-            height: '80px',
-            backgroundColor: '#fff3cd',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 24px',
-          }}>
+          <div className="inactive-icon-container">
             <svg
-              style={{
-                width: '48px',
-                height: '48px',
-                color: '#f59e0b',
-              }}
+              className="inactive-icon"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -57,73 +31,38 @@ export default function InactiveUserPage() {
           </div>
 
           {/* Título */}
-          <h1 style={{
-            fontSize: '24px',
-            fontWeight: 'bold',
-            color: '#333',
-            marginBottom: '20px',
-          }}>
+          <h1 className="inactive-title">
             Usuario Inactivo
           </h1>
 
           {/* Mensaje */}
-          <div style={{
-            color: '#666',
-            marginBottom: '24px',
-            lineHeight: '1.6',
-          }}>
-            <p style={{ marginBottom: '12px' }}>
-              Hola <span style={{ fontWeight: '600' }}>{user?.nombres} {user?.apellidos}</span>,
+          <div className="inactive-message">
+            <p>
+              Hola <span className="inactive-user-name">{user?.nombres} {user?.apellidos}</span>,
             </p>
-            <p style={{ marginBottom: '12px' }}>
-              Tu cuenta actualmente está <span style={{ fontWeight: '600', color: '#f59e0b' }}>inactiva</span>.
+            <p>
+              Tu cuenta actualmente está <span className="inactive-status">inactiva</span>.
             </p>
-            <p style={{ fontSize: '14px', marginTop: '16px' }}>
-              Por favor, comunícate con un <span style={{ fontWeight: '600' }}>administrador</span> del sistema
+            <p className="inactive-help-text">
+              Por favor, comunícate con un <span className="inactive-user-name">administrador</span> del sistema
               para solicitar la habilitación de tu cuenta.
             </p>
           </div>
 
           {/* Información de contacto */}
-          <div style={{
-            backgroundColor: '#f9f9f9',
-            borderRadius: '8px',
-            padding: '16px',
-            marginBottom: '24px',
-            textAlign: 'left',
-          }}>
-            <p style={{
-              fontSize: '14px',
-              color: '#555',
-              marginBottom: '8px',
-            }}>
-              <span style={{ fontWeight: '600' }}>Usuario:</span> {user?.username}
+          <div className="inactive-info-box">
+            <p className="inactive-info-item">
+              <span className="inactive-info-label">Usuario:</span> {user?.username}
             </p>
-            <p style={{
-              fontSize: '14px',
-              color: '#555',
-            }}>
-              <span style={{ fontWeight: '600' }}>Email:</span> {user?.email}
+            <p className="inactive-info-item">
+              <span className="inactive-info-label">Email:</span> {user?.email}
             </p>
           </div>
 
           {/* Botón de cerrar sesión */}
           <button
             onClick={handleLogout}
-            style={{
-              width: '100%',
-              padding: '12px 16px',
-              backgroundColor: '#666',
-              color: 'white',
-              fontWeight: '500',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '16px',
-              transition: 'background-color 0.2s',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#555'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#666'}
+            className="inactive-logout-button"
           >
             Cerrar Sesión
           </button>

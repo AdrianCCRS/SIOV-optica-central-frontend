@@ -95,7 +95,7 @@ export default function CategoriasPage() {
           onClick={() => setShowModal(true)}
           style={{
             padding: '10px 20px',
-            backgroundColor: '#4CAF50',
+            backgroundColor: 'var(--color-primary-dark)',
             color: 'white',
             border: 'none',
             borderRadius: '4px',
@@ -129,7 +129,7 @@ export default function CategoriasPage() {
                     onClick={() => handleEdit(categoria)}
                     style={{
                       padding: '6px 12px',
-                      backgroundColor: '#2196F3',
+                      backgroundColor: 'var(--color-primary-dark)',
                       color: 'white',
                       border: 'none',
                       borderRadius: '4px',
@@ -145,7 +145,7 @@ export default function CategoriasPage() {
                       onClick={() => handleDelete(categoria)}
                       style={{
                         padding: '6px 12px',
-                        backgroundColor: '#f44336',
+                        backgroundColor: 'var(--color-danger)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
@@ -259,7 +259,7 @@ export default function CategoriasPage() {
                   type="submit"
                   style={{
                     padding: '10px 20px',
-                    backgroundColor: '#4CAF50',
+                    backgroundColor: 'var(--color-primary-dark)',
                     color: 'white',
                     border: 'none',
                     borderRadius: '4px',

@@ -27,7 +27,7 @@ export default function SearchBar({ value, onChange, placeholder = "Buscar..." }
           outline: 'none',
           transition: 'all 0.2s',
         }}
-        onFocus={(e) => e.currentTarget.style.borderColor = '#4CAF50'}
+        onFocus={(e) => e.currentTarget.style.borderColor = 'var(--color-primary-dark)'}
         onBlur={(e) => e.currentTarget.style.borderColor = '#e2e8f0'}
       />
     </div>

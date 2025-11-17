@@ -40,14 +40,20 @@ button {
   font-size: 1em;
   font-weight: var(--font-weight-medium);
   font-family: inherit;
-  background-color: var(--color-text-primary);
-  color: white;
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
   cursor: pointer;
   transition: var(--transition-all);
 }
 
 button:hover:not(:disabled) {
-  background-color: var(--color-text-secondary);
+  background-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 button:disabled {

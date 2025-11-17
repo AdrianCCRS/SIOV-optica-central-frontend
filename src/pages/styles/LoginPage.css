@@ -1,0 +1,111 @@
+/* Login Page Styles */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--color-bg-tertiary);
+}
+
+.login-card {
+  background-color: var(--color-bg-primary);
+  padding: 40px;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-title {
+  text-align: center;
+  margin-bottom: 30px;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.login-form-group {
+  margin-bottom: 20px;
+}
+
+.login-label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+}
+
+.login-input {
+  width: 100%;
+  padding: 10px;
+  font-size: var(--font-size-xl);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  transition: var(--transition-colors);
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-alpha-10);
+}
+
+.login-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--color-bg-tertiary);
+}
+
+.login-error {
+  padding: 10px;
+  margin-bottom: 20px;
+  background-color: var(--color-danger-light);
+  color: var(--color-danger-dark);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-md);
+  border: 1px solid var(--color-danger);
+}
+
+.login-button {
+  width: 100%;
+  padding: var(--spacing-md);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: var(--transition-all);
+}
+
+.login-button:hover:not(:disabled) {
+  background-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.login-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.login-version {
+  margin-top: 20px;
+  text-align: center;
+  font-size: var(--font-size-md);
+  color: var(--color-text-tertiary);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login-card {
+    padding: var(--spacing-lg);
+    margin: var(--spacing-md);
+  }
+
+  .login-title {
+    font-size: var(--font-size-3xl);
+  }
+}

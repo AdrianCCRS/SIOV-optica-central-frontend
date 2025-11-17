@@ -103,13 +103,14 @@
 }
 
 .period-button:hover {
-  background: var(--color-bg-tertiary);
-  color: var(--color-text-secondary);
+  background: var(--color-primary) !important;
+  color: var(--color-text-inverse);
+  transform: translateY(-1px);
 }
 
 .period-button-active {
-  background: linear-gradient(to bottom right, var(--color-primary), var(--color-primary-dark));
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
   box-shadow: var(--shadow-primary);
 }
 
@@ -143,14 +144,14 @@
 }
 
 .tab-button:hover {
-  background: var(--color-bg-tertiary);
-  color: var(--color-text-secondary);
+  background: var(--color-bg-hover);
+  color: var(--color-text-inverse);
   transform: translateY(-2px);
 }
 
 .tab-button-active {
-  background: linear-gradient(to bottom right, var(--color-primary), var(--color-primary-dark));
-  color: white;
+  background: var(--color-primary-dark);
+  color: var(--color-text-inverse);
   box-shadow: var(--shadow-primary);
 }
 

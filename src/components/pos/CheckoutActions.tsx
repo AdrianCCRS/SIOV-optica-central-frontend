@@ -55,7 +55,7 @@ export default function CheckoutActions({
         style={{
           flex: 2,
           padding: '12px',
-          backgroundColor: isCheckoutDisabled ? '#f1f5f9' : '#4CAF50',
+          backgroundColor: isCheckoutDisabled ? '#f1f5f9' : 'var(--color-primary-dark)',
           color: isCheckoutDisabled ? '#a0aec0' : 'white',
           border: 'none',
           borderRadius: '8px',
@@ -75,7 +75,7 @@ export default function CheckoutActions({
         }}
         onMouseLeave={(e) => {
           if (!isCheckoutDisabled) {
-            e.currentTarget.style.backgroundColor = '#4CAF50';
+            e.currentTarget.style.backgroundColor = 'var(--color-primary-dark)';
             e.currentTarget.style.boxShadow = '0 2px 6px rgba(76, 175, 80, 0.3)';
             e.currentTarget.style.transform = 'translateY(0)';
           }

@@ -10,7 +10,7 @@ import type {
   ProductoMasVendido, StockPorCategoria, ProductoBajoStock, IVAGenerado,
   KPIMetricas, TopCliente, RendimientoCajero
 } from '../services/reportes.service';
-import './DashboardPage.css';
+import './styles/DashboardPage.css';
 
 type PeriodoVentas = 'dia' | 'semana' | 'mes';
 type TabDashboard = 'general' | 'ventas' | 'productos' | 'equipo';

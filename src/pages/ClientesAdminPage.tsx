@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 //import { useQueryClient } from '@tanstack/react-query';
 import { clientesService, type Cliente } from '../services/clientes.service';
 import LoadingSpinner from '../components/LoadingSpinner';
-import './ClientesAdminPage.css';
+import './styles/ClientesAdminPage.css';
 
 export default function ClientesAdminPage() {
   //const queryClient = useQueryClient();
@@ -124,76 +124,51 @@ export default function ClientesAdminPage() {
   }
 
   return (
-    <div style={{ padding: '32px', backgroundColor: '#f8f9fa', minHeight: '100%' }}>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '24px',
-      }}>
-        <h1 style={{ margin: 0, color: '#333', fontSize: '28px' }}>
+    <div className="clientes-container">
+      <div className="clientes-header">
+        <h1 className="clientes-title">
           Gestión de Clientes
         </h1>
         <button
           onClick={() => setShowModal(true)}
-          style={{
-            padding: '12px 24px',
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: 'bold',
-          }}
+          className="btn-nuevo-cliente"
         >
           + Nuevo Cliente
         </button>
       </div>
 
       {/* Barra de búsqueda */}
-      <div style={{ marginBottom: '24px' }}>
+      <div className="search-container">
         <input
           type="text"
           placeholder="Buscar por nombre, identificación o email..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '12px 16px',
-            fontSize: '14px',
-            border: '1px solid #ddd',
-            borderRadius: '6px',
-          }}
+          className="search-input"
         />
       </div>
 
       {/* Tabla de clientes */}
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        overflow: 'hidden',
-      }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <div className="table-wrapper">
+        <table className="clientes-table">
           <thead>
-            <tr style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #dee2e6' }}>
-              <th style={{ padding: '16px', textAlign: 'left', fontWeight: 'bold', color: '#495057' }}>
+            <tr className="table-header-row">
+              <th className="table-header">
                 Nombres
               </th>
-              <th style={{ padding: '16px', textAlign: 'left', fontWeight: 'bold', color: '#495057' }}>
+              <th className="table-header">
                 Apellidos
               </th>
-              <th style={{ padding: '16px', textAlign: 'left', fontWeight: 'bold', color: '#495057' }}>
+              <th className="table-header">
                 Identificación
               </th>
-              <th style={{ padding: '16px', textAlign: 'left', fontWeight: 'bold', color: '#495057' }}>
+              <th className="table-header">
                 Teléfono
               </th>
-              <th style={{ padding: '16px', textAlign: 'left', fontWeight: 'bold', color: '#495057' }}>
+              <th className="table-header">
                 Email
               </th>
-              <th style={{ padding: '16px', textAlign: 'center', fontWeight: 'bold', color: '#495057' }}>
+              <th className="table-header table-header-center">
                 Acciones
               </th>
             </tr>
@@ -201,50 +176,34 @@ export default function ClientesAdminPage() {
           <tbody>
             {clientesFiltrados.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: '#999' }}>
+                <td colSpan={6} className="table-empty">
                   No hay clientes registrados
                 </td>
               </tr>
             ) : (
               clientesFiltrados.map((cliente) => (
-                <tr key={cliente.id} style={{ borderBottom: '1px solid #dee2e6' }}>
-                  <td style={{ padding: '16px', color: '#333' }}>{cliente.nombres}</td>
-                  <td style={{ padding: '16px', color: '#333' }}>{cliente.apellidos}</td>
-                  <td style={{ padding: '16px', color: '#333' }}>
-                    <div style={{ fontSize: '12px', color: '#666', marginBottom: '2px' }}>
+                <tr key={cliente.id} className="table-row">
+                  <td className="table-cell">{cliente.nombres}</td>
+                  <td className="table-cell">{cliente.apellidos}</td>
+                  <td className="table-cell">
+                    <div className="identificacion-tipo">
                       {cliente.tipo_identificacion}
                     </div>
                     <div>{cliente.numero_identificacion}</div>
                   </td>
-                  <td style={{ padding: '16px', color: '#333' }}>{cliente.telefono || '-'}</td>
-                  <td style={{ padding: '16px', color: '#333' }}>{cliente.email || '-'}</td>
-                  <td style={{ padding: '16px', textAlign: 'center' }}>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                  <td className="table-cell">{cliente.telefono || '-'}</td>
+                  <td className="table-cell">{cliente.email || '-'}</td>
+                  <td className="table-cell table-cell-center">
+                    <div className="actions-container">
                       <button
                         onClick={() => handleEdit(cliente)}
-                        style={{
-                          padding: '6px 12px',
-                          backgroundColor: '#2196F3',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '12px',
-                        }}
+                        className="btn-editar"
                       >
                         Editar
                       </button>
                       <button
                         onClick={() => handleDelete(cliente)}
-                        style={{
-                          padding: '6px 12px',
-                          backgroundColor: '#f44336',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '12px',
-                        }}
+                        className="btn-eliminar"
                       >
                         Eliminar
                       </button>
@@ -260,40 +219,21 @@ export default function ClientesAdminPage() {
       {/* Modal de Crear/Editar Cliente */}
       {showModal && (
         <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-          }}
+          className="modal-overlay"
           onClick={handleCloseModal}
         >
           <div
-            style={{
-              backgroundColor: 'white',
-              borderRadius: '8px',
-              padding: '24px',
-              width: '90%',
-              maxWidth: '600px',
-              maxHeight: '90vh',
-              overflow: 'auto',
-            }}
+            className="modal-content"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 style={{ margin: '0 0 24px 0', color: '#333' }}>
+            <h2 className="modal-title">
               {editingCliente ? 'Editar Cliente' : 'Nuevo Cliente'}
             </h2>
 
             <form onSubmit={handleSubmit}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+              <div className="form-grid-2col">
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
+                  <label className="form-label">
                     Nombres *
                   </label>
                   <input
@@ -301,18 +241,12 @@ export default function ClientesAdminPage() {
                     required
                     value={formData.nombres}
                     onChange={(e) => setFormData({ ...formData, nombres: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      fontSize: '14px',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px',
-                    }}
+                    className="form-input"
                   />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
+                  <label className="form-label">
                     Apellidos *
                   </label>
                   <input
@@ -320,33 +254,21 @@ export default function ClientesAdminPage() {
                     required
                     value={formData.apellidos}
                     onChange={(e) => setFormData({ ...formData, apellidos: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      fontSize: '14px',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px',
-                    }}
+                    className="form-input"
                   />
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '16px', marginBottom: '16px' }}>
+              <div className="form-grid-id">
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
+                  <label className="form-label">
                     Tipo Identificación *
                   </label>
                   <select
                     required
                     value={formData.tipo_identificacion}
                     onChange={(e) => setFormData({ ...formData, tipo_identificacion: e.target.value as any })}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      fontSize: '14px',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px',
-                    }}
+                    className="form-input"
                   >
                     <option value="CC">CC</option>
                     <option value="CE">CE</option>
@@ -356,7 +278,7 @@ export default function ClientesAdminPage() {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
+                  <label className="form-label">
                     Número de Identificación *
                   </label>
                   <input
@@ -364,100 +286,58 @@ export default function ClientesAdminPage() {
                     required
                     value={formData.numero_identificacion}
                     onChange={(e) => setFormData({ ...formData, numero_identificacion: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      fontSize: '14px',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px',
-                    }}
+                    className="form-input"
                   />
                 </div>
               </div>
 
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
+              <div className="form-group">
+                <label className="form-label">
                   Teléfono
                 </label>
                 <input
                   type="tel"
                   value={formData.telefono}
                   onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    fontSize: '14px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                  }}
+                  className="form-input"
                 />
               </div>
 
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
+              <div className="form-group">
+                <label className="form-label">
                   Email
                 </label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    fontSize: '14px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                  }}
+                  className="form-input"
                 />
               </div>
 
-              <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
+              <div className="form-group-last">
+                <label className="form-label">
                   Dirección
                 </label>
                 <textarea
                   value={formData.direccion}
                   onChange={(e) => setFormData({ ...formData, direccion: e.target.value })}
                   rows={3}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    fontSize: '14px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    resize: 'vertical',
-                  }}
+                  className="form-textarea"
                 />
               </div>
 
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <div className="modal-actions">
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  style={{
-                    padding: '10px 20px',
-                    backgroundColor: '#6c757d',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                  }}
+                  className="btn-cancelar"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  style={{
-                    padding: '10px 20px',
-                    backgroundColor: '#4CAF50',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: 'bold',
-                  }}
+                  className="btn-guardar"
                 >
                   {editingCliente ? 'Actualizar' : 'Crear'} Cliente
                 </button>

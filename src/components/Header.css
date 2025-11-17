@@ -4,7 +4,6 @@
   box-shadow: var(--shadow-lg);
   position: sticky;
   top: 0;
-  z-index: var(--z-sticky);
 }
 
 /* Top Bar - Logo y Usuario */

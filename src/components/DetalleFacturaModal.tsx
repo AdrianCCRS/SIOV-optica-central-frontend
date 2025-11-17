@@ -53,7 +53,7 @@ export default function DetalleFacturaModal({ facturaId, numeroFactura, onClose 
               border: 'none',
               background: 'none',
               cursor: 'pointer',
-              color: '#666',
+              color: 'var(--color-text-primary)',
             }}
           >
             ×
@@ -73,7 +73,7 @@ export default function DetalleFacturaModal({ facturaId, numeroFactura, onClose 
               gap: '15px',
               marginBottom: '20px',
               padding: '15px',
-              backgroundColor: '#f9f9f9',
+              backgroundColor: 'var(--color-bg-primary)',
               borderRadius: '4px',
             }}>
               <div>
@@ -167,7 +167,7 @@ export default function DetalleFacturaModal({ facturaId, numeroFactura, onClose 
                   borderTop: '2px solid #333',
                 }}>
                   <span>TOTAL:</span>
-                  <span style={{ color: '#4CAF50' }}>{formatCurrency(factura.total)}</span>
+                  <span style={{ color: 'var(--color-primary-dark)' }}>{formatCurrency(factura.total)}</span>
                 </div>
               </div>
             </div>
@@ -193,7 +193,7 @@ export default function DetalleFacturaModal({ facturaId, numeroFactura, onClose 
                 onClick={() => window.print()}
                 style={{
                   padding: '10px 20px',
-                  backgroundColor: '#2196F3',
+                  backgroundColor: 'var(--color-primary-dark)',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',

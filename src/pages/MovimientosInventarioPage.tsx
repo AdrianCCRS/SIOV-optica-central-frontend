@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useUserRole } from '../hooks/useUserRole';
 import { inventarioService, type MovimientoInventario, type CreateMovimientoData } from '../services/inventario.service';
 import { productosService, type Producto } from '../services/productos.service';
-import { useUserRole } from '../hooks/useUserRole';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function MovimientosInventarioPage() {
   const queryClient = useQueryClient();
-  const { isAdministrador } = useUserRole();
+  const isAdministrador = useUserRole().isAdministrador;
   const [movimientos, setMovimientos] = useState<MovimientoInventario[]>([]);
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,15 +93,16 @@ export default function MovimientosInventarioPage() {
         stockResultante += cantidad;
       }
 
+      // Convertir fecha a ISO 8601 (datetime) para Strapi
+      const fechaISO = new Date(formData.fecha + 'T00:00:00').toISOString();
       const data: CreateMovimientoData = {
         tipo_movimiento: formData.tipo_movimiento,
         cantidad: cantidad,
         motivo: formData.motivo,
-        fecha: formData.fecha,
+        fecha: fechaISO,
         stock_resultante: stockResultante,
         producto: parseInt(formData.producto)
       };
-
       await inventarioService.create(data);
       
       // Invalidar la caché de productos con bajo stock para actualizar las alertas en tiempo real
@@ -126,23 +127,6 @@ export default function MovimientosInventarioPage() {
     });
   };
 
-  const handleDelete = async (movimiento: MovimientoInventario) => {
-    if (!confirm(`¿Estás seguro de eliminar este movimiento de inventario?`)) {
-      return;
-    }
-
-    try {
-      await inventarioService.delete(movimiento.documentId);
-      
-      // Invalidar la caché de productos con bajo stock
-      queryClient.invalidateQueries({ queryKey: ['productos-bajo-stock'] });
-      
-      alert('Movimiento eliminado exitosamente');
-      loadData();
-    } catch (error) {
-      alert('Error al eliminar el movimiento.');
-    }
-  };
 
   const handleCloseModal = () => {
     setShowModal(false);
@@ -152,7 +136,7 @@ export default function MovimientosInventarioPage() {
   const getTipoColor = (tipo: string | undefined) => {
     if (!tipo) return '#999';
     switch (tipo) {
-      case 'Entrada': return '#4CAF50';
+      case 'Entrada': return 'var(--color-primary-dark)';
       case 'Salida': return '#f44336';
       case 'Ajuste Inventario': return '#FF9800';
       case 'Devolución': return '#2196F3';
@@ -183,7 +167,7 @@ export default function MovimientosInventarioPage() {
           onClick={() => setShowModal(true)}
           style={{
             padding: '10px 20px',
-            backgroundColor: '#4CAF50',
+            backgroundColor: 'var(--color-primary-dark)',
             color: 'white',
             border: 'none',
             borderRadius: '4px',
@@ -241,19 +225,27 @@ export default function MovimientosInventarioPage() {
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '700px' }}>
           <thead>
             <tr style={{ backgroundColor: '#f5f5f5', borderBottom: '2px solid #ddd' }}>
-              <th style={{ padding: '12px', textAlign: 'left' }}>Fecha</th>
-              <th style={{ padding: '12px', textAlign: 'left' }}>Producto</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>Fecha</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>Producto</th>
               <th style={{ padding: '12px', textAlign: 'center' }}>Tipo</th>
               <th style={{ padding: '12px', textAlign: 'center' }}>Cantidad</th>
-              <th style={{ padding: '12px', textAlign: 'left' }}>Motivo</th>
-              {isAdministrador && <th style={{ padding: '12px', textAlign: 'center' }}>Acciones</th>}
+              <th style={{ padding: '12px', textAlign: 'center' }}>Motivo</th>
+              <th style={{ padding: '12px', textAlign: 'center' }}>Stock Resultante</th>
+              { isAdministrador && <th style={{ padding: '12px', textAlign: 'center' }}>Usuario</th> }
             </tr>
           </thead>
           <tbody>
             {movimientos.map(movimiento => (
               <tr key={movimiento.id} style={{ borderBottom: '1px solid #eee' }}>
                 <td style={{ padding: '12px' }}>
-                  {new Date(movimiento.fecha).toLocaleDateString('es-ES')}
+                  {new Date(movimiento.fecha).toLocaleString('es-ES', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                  })}
                 </td>
                 <td style={{ padding: '12px', fontWeight: 'bold' }}>
                   {movimiento.producto ? (
@@ -281,7 +273,7 @@ export default function MovimientosInventarioPage() {
                   padding: '12px', 
                   textAlign: 'center',
                   fontWeight: 'bold',
-                  color: movimiento.tipo_movimiento === 'Entrada' || movimiento.tipo_movimiento === 'Devolución' ? '#4CAF50' : 
+                  color: movimiento.tipo_movimiento === 'Entrada' || movimiento.tipo_movimiento === 'Devolución' ? 'var(--color-primary-dark)' : 
                          movimiento.tipo_movimiento === 'Salida' ? '#f44336' : '#FF9800'
                 }}>
                   {movimiento.tipo_movimiento === 'Entrada' || movimiento.tipo_movimiento === 'Devolución' ? '+' : 
@@ -291,24 +283,12 @@ export default function MovimientosInventarioPage() {
                 <td style={{ padding: '12px' }}>
                   {movimiento.motivo || '-'}
                 </td>
-                {isAdministrador && (
-                  <td style={{ padding: '12px', textAlign: 'center' }}>
-                    <button
-                      onClick={() => handleDelete(movimiento)}
-                      style={{
-                        padding: '6px 12px',
-                        backgroundColor: '#f44336',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px'
-                      }}
-                    >
-                      Eliminar
-                    </button>
-                  </td>
-                )}
+                <td style={{ padding: '12px', textAlign: 'center' }}>
+                    {movimiento.stock_resultante}
+                </td>
+                { isAdministrador && <td style={{ padding: '12px', textAlign: 'center' }}>
+                    {movimiento.user?.nombres} {movimiento.user?.apellidos}
+                </td>}
               </tr>
             ))}
           </tbody>
@@ -481,7 +461,7 @@ export default function MovimientosInventarioPage() {
                   type="submit"
                   style={{
                     padding: '10px 20px',
-                    backgroundColor: '#4CAF50',
+                    backgroundColor: 'var(--color-primary-dark)',
                     color: 'white',
                     border: 'none',
                     borderRadius: '4px',

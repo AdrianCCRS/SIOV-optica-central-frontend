@@ -4,6 +4,7 @@ import { ventasService, type BuscarFacturasParams } from '../services/ventas.ser
 import { formatCurrency } from '../utils/format';
 import DetalleFacturaModal from '../components/DetalleFacturaModal';
 import LoadingSpinner from '../components/LoadingSpinner';
+import './styles/HistoricoVentasPage.css';
 
 export const HistoricoVentasPage = () => {
   const [facturaSeleccionada, setFacturaSeleccionada] = useState<number | null>(null);
@@ -42,119 +43,43 @@ export const HistoricoVentasPage = () => {
   };
 
   return (
-    <div style={{ 
-      padding: '32px', 
-      backgroundColor: '#f8f9fa', 
-      minHeight: '100%',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-    }}>
-      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-        <h1 style={{ 
-          fontSize: '28px', 
-          fontWeight: '700', 
-          marginBottom: '32px', 
-          color: '#1a202c',
-          letterSpacing: '-0.5px',
-        }}>
+    <div className="historico-container">
+      <div className="historico-inner">
+        <h1 className="historico-title">
           Histórico de Ventas
         </h1>
 
         {/* Formulario de búsqueda */}
-        <div style={{
-          backgroundColor: 'white',
-          borderRadius: '12px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-          padding: '28px',
-          marginBottom: '28px',
-          border: '1px solid #e2e8f0',
-        }}>
-          <h2 style={{ 
-            fontSize: '13px', 
-            fontWeight: '600', 
-            marginBottom: '20px', 
-            color: '#2d3748',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}>
+        <div className="filtros-card">
+          <h2 className="filtros-title">
             Filtros de Búsqueda
           </h2>
           <form onSubmit={handleBuscar}>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: '20px',
-              marginBottom: '24px',
-            }}>
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  color: '#4a5568',
-                  marginBottom: '10px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.3px',
-                }}>
+            <div className="filtros-grid">
+              <div className="filtro-field">
+                <label>
                   Fecha Inicio
                 </label>
                 <input
                   type="date"
                   value={filtros.fechaInicio}
                   onChange={(e) => setFiltros({ ...filtros, fechaInicio: e.target.value })}
-                  style={{
-                    width: '100%',
-                    padding: '11px 14px',
-                    border: '2px solid #e2e8f0',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    transition: 'all 0.2s',
-                    outline: 'none',
-                  }}
-                  onFocus={(e) => e.currentTarget.style.borderColor = '#4CAF50'}
-                  onBlur={(e) => e.currentTarget.style.borderColor = '#e2e8f0'}
                 />
               </div>
 
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  color: '#4a5568',
-                  marginBottom: '10px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.3px',
-                }}>
+              <div className="filtro-field">
+                <label>
                   Fecha Fin
                 </label>
                 <input
                   type="date"
                   value={filtros.fechaFin}
                   onChange={(e) => setFiltros({ ...filtros, fechaFin: e.target.value })}
-                  style={{
-                    width: '100%',
-                    padding: '11px 14px',
-                    border: '2px solid #e2e8f0',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    transition: 'all 0.2s',
-                    outline: 'none',
-                  }}
-                  onFocus={(e) => e.currentTarget.style.borderColor = '#4CAF50'}
-                  onBlur={(e) => e.currentTarget.style.borderColor = '#e2e8f0'}
                 />
               </div>
 
-              <div>
-                <label style={{
-                  display: 'block',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  color: '#4a5568',
-                  marginBottom: '10px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.3px',
-                }}>
+              <div className="filtro-field">
+                <label>
                   Número de Factura
                 </label>
                 <input
@@ -162,69 +87,21 @@ export const HistoricoVentasPage = () => {
                   value={filtros.numeroFactura}
                   onChange={(e) => setFiltros({ ...filtros, numeroFactura: e.target.value })}
                   placeholder="Ej: FAC-2024-001"
-                  style={{
-                    width: '100%',
-                    padding: '11px 14px',
-                    border: '2px solid #e2e8f0',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    transition: 'all 0.2s',
-                    outline: 'none',
-                  }}
-                  onFocus={(e) => e.currentTarget.style.borderColor = '#4CAF50'}
-                  onBlur={(e) => e.currentTarget.style.borderColor = '#e2e8f0'}
                 />
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+            <div className="filtros-actions">
               <button
                 type="button"
                 onClick={handleLimpiar}
-                style={{
-                  padding: '12px 28px',
-                  backgroundColor: 'white',
-                  color: '#4a5568',
-                  border: '2px solid #e2e8f0',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  transition: 'all 0.2s',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f7fafc';
-                  e.currentTarget.style.borderColor = '#cbd5e0';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'white';
-                  e.currentTarget.style.borderColor = '#e2e8f0';
-                }}
+                className="btn-limpiar"
               >
                 Limpiar
               </button>
               <button
                 type="submit"
-                style={{
-                  padding: '12px 32px',
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 2px 4px rgba(76, 175, 80, 0.2)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#45a049';
-                  e.currentTarget.style.boxShadow = '0 4px 8px rgba(76, 175, 80, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#4CAF50';
-                  e.currentTarget.style.boxShadow = '0 2px 4px rgba(76, 175, 80, 0.2)';
-                }}
+                className="btn-buscar"
               >
                 Buscar
               </button>
@@ -236,17 +113,11 @@ export const HistoricoVentasPage = () => {
         {isLoading && <LoadingSpinner message="Buscando facturas..." />}
 
         {error && (
-          <div style={{
-            backgroundColor: '#fff5f5',
-            border: '1px solid #fc8181',
-            borderRadius: '12px',
-            padding: '20px 24px',
-            marginBottom: '28px',
-          }}>
-            <p style={{ fontWeight: '700', color: '#c53030', marginBottom: '6px', fontSize: '14px' }}>
+          <div className="error-alert">
+            <p className="error-alert-title">
               Error al cargar datos
             </p>
-            <p style={{ color: '#e53e3e', fontSize: '14px' }}>
+            <p className="error-alert-message">
               No se pudieron cargar las facturas. Por favor, intente nuevamente.
             </p>
           </div>
@@ -255,228 +126,58 @@ export const HistoricoVentasPage = () => {
         {data && (
           <>
             {/* Resumen */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '20px',
-              marginBottom: '28px',
-            }}>
-              <div style={{
-                backgroundColor: 'white',
-                borderRadius: '12px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-                padding: '28px',
-                border: '1px solid #e2e8f0',
-                position: 'relative',
-                overflow: 'hidden',
-              }}>
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '4px',
-                  background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
-                }}></div>
-                <p style={{ 
-                  fontSize: '12px', 
-                  color: '#718096', 
-                  marginBottom: '12px',
-                  fontWeight: '600',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                }}>
+            <div className="resumen-grid">
+              <div className="resumen-card">
+                <div className="resumen-card-gradient-primary"></div>
+                <p className="resumen-card-label">
                   Total de Facturas
                 </p>
-                <p style={{ 
-                  fontSize: '36px', 
-                  fontWeight: '700', 
-                  color: '#667eea',
-                  lineHeight: '1',
-                }}>
+                <p className="resumen-card-value resumen-card-value-primary">
                   {data.resumen.cantidad}
                 </p>
               </div>
-              <div style={{
-                backgroundColor: 'white',
-                borderRadius: '12px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-                padding: '28px',
-                border: '1px solid #e2e8f0',
-                position: 'relative',
-                overflow: 'hidden',
-              }}>
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '4px',
-                  background: 'linear-gradient(90deg, #4CAF50 0%, #45a049 100%)',
-                }}></div>
-                <p style={{ 
-                  fontSize: '12px', 
-                  color: '#718096', 
-                  marginBottom: '12px',
-                  fontWeight: '600',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                }}>
+              <div className="resumen-card">
+                <div className="resumen-card-gradient-success"></div>
+                <p className="resumen-card-label">
                   Total en Ventas
                 </p>
-                <p style={{ 
-                  fontSize: '36px', 
-                  fontWeight: '700', 
-                  color: '#4CAF50',
-                  lineHeight: '1',
-                }}>
+                <p className="resumen-card-value resumen-card-value-success">
                   {formatCurrency(data.resumen.total_ventas)}
                 </p>
               </div>
             </div>
 
             {/* Tabla de facturas */}
-            <div style={{
-              backgroundColor: 'white',
-              borderRadius: '12px',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-              overflow: 'hidden',
-              border: '1px solid #e2e8f0',
-            }}>
+            <div className="tabla-container">
               {data.facturas.length === 0 ? (
-                <div style={{ 
-                  padding: '64px', 
-                  textAlign: 'center', 
-                  color: '#a0aec0',
-                }}>
-                  <p style={{ fontSize: '16px', fontWeight: '500' }}>
+                <div className="tabla-empty-state">
+                  <p>
                     No se encontraron facturas con los filtros aplicados
                   </p>
                 </div>
               ) : (
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <div className="tabla-scroll">
+                  <table className="historico-table">
                     <thead>
-                      <tr style={{ 
-                        background: 'linear-gradient(to right, #f7fafc, #edf2f7)',
-                        borderBottom: '2px solid #e2e8f0',
-                      }}>
-                        <th style={{
-                          padding: '16px 20px',
-                          textAlign: 'left',
-                          fontSize: '11px',
-                          fontWeight: '700',
-                          color: '#4a5568',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.8px',
-                        }}>
-                          Factura
-                        </th>
-                        <th style={{
-                          padding: '16px 20px',
-                          textAlign: 'left',
-                          fontSize: '11px',
-                          fontWeight: '700',
-                          color: '#4a5568',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.8px',
-                        }}>
-                          Fecha y Hora
-                        </th>
-                        <th style={{
-                          padding: '16px 20px',
-                          textAlign: 'left',
-                          fontSize: '11px',
-                          fontWeight: '700',
-                          color: '#4a5568',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.8px',
-                        }}>
-                          Cliente
-                        </th>
-                        <th style={{
-                          padding: '16px 20px',
-                          textAlign: 'left',
-                          fontSize: '11px',
-                          fontWeight: '700',
-                          color: '#4a5568',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.8px',
-                        }}>
-                          Usuario
-                        </th>
-                        <th style={{
-                          padding: '16px 20px',
-                          textAlign: 'left',
-                          fontSize: '11px',
-                          fontWeight: '700',
-                          color: '#4a5568',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.8px',
-                        }}>
-                          Medio de Pago
-                        </th>
-                        <th style={{
-                          padding: '16px 20px',
-                          textAlign: 'right',
-                          fontSize: '11px',
-                          fontWeight: '700',
-                          color: '#4a5568',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.8px',
-                        }}>
-                          Total
-                        </th>
-                        <th style={{
-                          padding: '16px 20px',
-                          textAlign: 'center',
-                          fontSize: '11px',
-                          fontWeight: '700',
-                          color: '#4a5568',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.8px',
-                        }}>
-                          Acciones
-                        </th>
+                      <tr>
+                        <th>Factura</th>
+                        <th>Fecha y Hora</th>
+                        <th>Cliente</th>
+                        <th>Usuario</th>
+                        <th>Medio de Pago</th>
+                        <th className="align-right">Total</th>
+                        <th className="align-center">Acciones</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {data.facturas.map((factura, index) => (
-                        <tr
-                          key={factura.id}
-                          style={{ 
-                            borderBottom: '1px solid #f1f5f9',
-                            backgroundColor: index % 2 === 0 ? 'white' : '#fafbfc',
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = '#f8fafb';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = index % 2 === 0 ? 'white' : '#fafbfc';
-                          }}
-                        >
-                          <td style={{
-                            padding: '18px 20px',
-                            fontSize: '14px',
-                            fontWeight: '700',
-                            color: '#2d3748',
-                          }}>
-                            <span style={{
-                              display: 'inline-block',
-                              padding: '4px 10px',
-                              backgroundColor: '#edf2f7',
-                              borderRadius: '6px',
-                              fontSize: '13px',
-                              color: '#4a5568',
-                            }}>
+                      {data.facturas.map((factura) => (
+                        <tr key={factura.id}>
+                          <td>
+                            <span className="factura-badge">
                               {factura.numero_factura}
                             </span>
                           </td>
-                          <td style={{
-                            padding: '18px 20px',
-                            fontSize: '14px',
-                            color: '#718096',
-                          }}>
+                          <td className="fecha-cell">
                             {new Date(factura.fecha_emision).toLocaleString('es-ES', {
                               year: 'numeric',
                               month: '2-digit',
@@ -485,80 +186,30 @@ export const HistoricoVentasPage = () => {
                               minute: '2-digit',
                             })}
                           </td>
-                          <td style={{
-                            padding: '18px 20px',
-                            fontSize: '14px',
-                            color: '#2d3748',
-                            fontWeight: '500',
-                          }}>
+                          <td className="cliente-name">
                             {factura.cliente
                               ? `${factura.cliente.nombres} ${factura.cliente.apellidos}`
-                              : <span style={{ color: '#a0aec0', fontStyle: 'italic' }}>N/A</span>}
+                              : <span className="na-text">N/A</span>}
                           </td>
-                          <td style={{
-                            padding: '18px 20px',
-                            fontSize: '14px',
-                            color: '#718096',
-                          }}>
+                          <td className="usuario-name">
                             {factura.user
                               ? factura.user.nombres && factura.user.apellidos
                                 ? `${factura.user.nombres} ${factura.user.apellidos}`
                                 : factura.user.username
-                              : <span style={{ color: '#a0aec0', fontStyle: 'italic' }}>N/A</span>}
+                              : <span className="na-text">N/A</span>}
                           </td>
-                          <td style={{
-                            padding: '18px 20px',
-                            fontSize: '14px',
-                          }}>
-                            <span style={{
-                              display: 'inline-block',
-                              padding: '4px 12px',
-                              backgroundColor: '#e6f7ff',
-                              color: '#0066cc',
-                              borderRadius: '20px',
-                              fontSize: '13px',
-                              fontWeight: '600',
-                            }}>
+                          <td>
+                            <span className="pago-badge">
                               {factura.medio_pago}
                             </span>
                           </td>
-                          <td style={{
-                            padding: '18px 20px',
-                            fontSize: '16px',
-                            fontWeight: '700',
-                            textAlign: 'right',
-                            color: '#2d3748',
-                          }}>
+                          <td className="total-cell">
                             {formatCurrency(factura.total)}
                           </td>
-                          <td style={{
-                            padding: '18px 20px',
-                            textAlign: 'center',
-                          }}>
+                          <td className="align-center">
                             <button
                               onClick={() => setFacturaSeleccionada(factura.id)}
-                              style={{
-                                padding: '10px 20px',
-                                backgroundColor: '#667eea',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '8px',
-                                cursor: 'pointer',
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                transition: 'all 0.2s',
-                                boxShadow: '0 2px 4px rgba(102, 126, 234, 0.2)',
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = '#5a67d8';
-                                e.currentTarget.style.boxShadow = '0 4px 8px rgba(102, 126, 234, 0.3)';
-                                e.currentTarget.style.transform = 'translateY(-1px)';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = '#667eea';
-                                e.currentTarget.style.boxShadow = '0 2px 4px rgba(102, 126, 234, 0.2)';
-                                e.currentTarget.style.transform = 'translateY(0)';
-                              }}
+                              className="btn-ver-detalle"
                             >
                               Ver Detalles
                             </button>
@@ -574,17 +225,11 @@ export const HistoricoVentasPage = () => {
         )}
 
         {!data && Object.keys(filtrosAplicados).length === 0 && (
-          <div style={{
-            backgroundColor: '#ebf8ff',
-            border: '1px solid #90cdf4',
-            borderRadius: '12px',
-            padding: '32px',
-            textAlign: 'center',
-          }}>
-            <p style={{ fontSize: '16px', color: '#2c5282', fontWeight: '600', marginBottom: '8px' }}>
+          <div className="info-alert">
+            <p className="info-alert-title">
               Búsqueda de Facturas
             </p>
-            <p style={{ fontSize: '14px', color: '#4299e1' }}>
+            <p className="info-alert-message">
               Seleccione al menos un filtro y presione "Buscar" para ver los resultados
             </p>
           </div>

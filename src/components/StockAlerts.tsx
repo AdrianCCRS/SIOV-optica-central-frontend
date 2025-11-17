@@ -184,7 +184,7 @@ export default function StockAlerts({ onViewDetails }: StockAlertsProps) {
                 style={{
                   width: '100%',
                   padding: '8px',
-                  backgroundColor: '#4CAF50',
+                  backgroundColor: 'var(--color-primary-dark)',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',

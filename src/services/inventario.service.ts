@@ -1,4 +1,6 @@
 import api from './api';
+import type { AuthUser } from './auth.service';
+
 
 export interface MovimientoInventario {
   id: number;
@@ -7,6 +9,7 @@ export interface MovimientoInventario {
   cantidad: number;
   motivo: string;
   fecha: string;
+  user: AuthUser;
   stock_resultante: number;
   producto?: {
     id: number;
@@ -50,7 +53,7 @@ export const inventarioService = {
     fechaInicio?: string;
     fechaFin?: string;
   }): Promise<MovimientoInventario[]> {
-    let url = '/movimiento-inventarios?populate=producto&sort=fecha:desc';
+    let url = '/movimiento-inventarios?populate=producto&populate=user&sort=fecha:desc';
     
     if (filters?.tipo_movimiento) {
       url += `&filters[tipo_movimiento][$eq]=${filters.tipo_movimiento}`;
@@ -72,6 +75,7 @@ export const inventarioService = {
       tipo_movimiento: item.tipo_movimiento,
       cantidad: item.cantidad || 0,
       motivo: item.motivo,
+      user: item.user,
       fecha: item.fecha,
       stock_resultante: item.stock_resultante,
       createdAt: item.createdAt,
@@ -86,11 +90,12 @@ export const inventarioService = {
 
   // Obtener movimiento por documentId
   async getById(documentId: string): Promise<MovimientoInventario> {
-    const response = await api.get<MovimientoResponse>(`/movimiento-inventarios/${documentId}?populate=producto`);
+  const response = await api.get<MovimientoResponse>(`/movimiento-inventarios/${documentId}?populate=producto&populate=user`);
     const item = response.data.data;
     return {
       id: item.id,
       documentId: item.documentId,
+      user: item.user,
       tipo_movimiento: item.tipo_movimiento,
       cantidad: item.cantidad,
       motivo: item.motivo,
@@ -111,6 +116,7 @@ export const inventarioService = {
     return {
       id: item.id,
       documentId: item.documentId,
+      user: item.user,
       tipo_movimiento: item.tipo_movimiento,
       cantidad: item.cantidad,
       motivo: item.motivo,
@@ -133,6 +139,7 @@ export const inventarioService = {
       documentId: item.documentId,
       tipo_movimiento: item.tipo_movimiento,
       cantidad: item.cantidad,
+      user: item.user,
       motivo: item.motivo,
       fecha: item.fecha,
       stock_resultante: item.stock_resultante,

@@ -42,7 +42,7 @@ export default function TotalesSummary({ subtotal, totalIva, total }: TotalesSum
         fontSize: '18px',
       }}>
         <span style={{ fontWeight: '700', color: '#1a202c' }}>Total:</span>
-        <span style={{ fontWeight: '700', color: '#4CAF50' }}>{formatCurrency(total)}</span>
+        <span style={{ fontWeight: '700', color: 'var(--color-primary-dark)' }}>{formatCurrency(total)}</span>
       </div>
     </div>
   );

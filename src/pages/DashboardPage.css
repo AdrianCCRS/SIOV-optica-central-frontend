@@ -113,6 +113,52 @@
   box-shadow: 0 4px 6px rgba(0, 136, 254, 0.25);
 }
 
+/* Tabs Container */
+.tabs-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  background: white;
+  padding: 8px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #E5E7EB;
+}
+
+.tab-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+  color: #6B7280;
+}
+
+.tab-button:hover {
+  background: #F3F4F6;
+  color: #374151;
+  transform: translateY(-2px);
+}
+
+.tab-button-active {
+  background: linear-gradient(to bottom right, #0088FE, #0066CC);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 136, 254, 0.3);
+}
+
+.tab-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
 /* KPI Cards Container */
 .kpi-container {
   display: grid;
@@ -571,6 +617,20 @@
     flex: 1;
     padding: 10px 16px;
     font-size: 14px;
+  }
+  
+  .tabs-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .tab-button {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+  
+  .tab-icon {
+    font-size: 18px;
   }
   
   .kpi-container {

@@ -204,6 +204,39 @@ export default function DetalleFacturaModal({ facturaId, numeroFactura, onClose 
               >
                 Imprimir
               </button>
+              <button
+                onClick={async () => {
+                  try {
+                    const response = await fetch(`/api/facturas/${facturaId}/send-email`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                    });
+
+                    if (response.ok) {
+                      alert('Correo enviado exitosamente');
+                    } else {
+                      alert('Error al enviar el correo');
+                    }
+                  } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al enviar el correo');
+                  }
+                }}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: '#007BFF', // Cambiado a un azul para diferenciarlo del fondo
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                }}
+              >
+                Enviar por Correo
+              </button>
             </div>
           </>
         )}

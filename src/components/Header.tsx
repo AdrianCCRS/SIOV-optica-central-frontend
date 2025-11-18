@@ -233,13 +233,15 @@ export default function Header({ currentPage, onNavigate }: HeaderProps) {
               <Icons.Clock />
               <span>Histórico</span>
             </button>
-            <button
+            {//TODO: Habilitar gestión de usuarios en próxima versión 
+            }
+            {/* <button
               onClick={() => onNavigate('usuarios' as any)}
               className={`nav-button ${currentPage === 'usuarios' ? 'nav-button-active' : ''}`}
             >
               <Icons.Users />
               <span>Usuarios</span>
-            </button>
+            </button> */}
           </>
         ) : isBodeguero ? (
           // Tabs para bodeguero
